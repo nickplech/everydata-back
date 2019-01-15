@@ -1,0 +1,110 @@
+enum Permission {
+  ADMIN
+  USER
+  CLIENTCREATE
+  CLIENTUPDATE
+  CLIENTDELETE
+  PERMISSIONUPDATE
+}
+
+type User {
+  id: ID! @unique
+  name: String!
+  email: String! @unique
+  businessName: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: Float
+  permissions: [Permission]
+  appointments: [Appointment!]!
+  cart: [CartItem!]!
+  subscription: [CartPackage!]!
+}
+
+type Client {
+  id: ID! @unique
+  firstName: String!
+  lastName: String!
+  dependantFirstName: String
+  dependantLastName: String
+  cellPhone: String! @unique
+  birthDay: DateTime
+  image: String
+  user: User!
+  sentReminder: [TextReminder!]!
+  confirmedReminder: [TextReminder!]!
+  canceledReminder: [TextReminder!]!
+}
+
+type Appointment {
+  id: ID! @unique
+  reason: String!
+  provider: String
+  date: DateTime!
+  time: DateTime!
+  length: Int!
+  bookedBy: String
+  note: String
+  client: Client!
+  user: User!
+}
+
+# type TimeRange {
+
+# }
+
+type TextReminder {
+  id: ID! @unique
+  content: String!
+  date: DateTime
+  time: DateTime
+  name: String
+  customVar: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  client: Client!
+}
+
+type CartItem {
+  id: ID! @unique
+  quantity: Int! @default(value: 1)
+  client: Client
+  user: User!
+  date: DateTime
+}
+
+type Package {
+  id: ID! @unique
+  title: String!
+  description: String!
+  price: Int!
+  user: User!
+  image: String!
+  quantity: Int! @default(value: 1)
+}
+
+type CartPackage {
+  id: ID! @unique
+  quantity: Int! @default(value: 1)
+  user: User!
+  package: Package
+}
+
+type OrderPackage {
+  id: ID! @unique
+  title: String!
+  description: String!
+  image: String!
+  price: Int!
+  quantity: Int! @default(value: 1)
+  user: User!
+}
+
+type Order {
+  id: ID! @unique
+  packages: [OrderPackage!]!
+  total: Int!
+  user: User!
+  charge: String!
+}

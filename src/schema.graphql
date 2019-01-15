@@ -1,0 +1,64 @@
+# import * from './generated/prisma.graphql'
+
+type SuccessMessage {
+  message: String
+}
+
+type Mutation {
+  createClient(
+    firstName: String
+    lastName: String
+    cellPhone: String
+    birthDay: DateTime
+    image: String
+  ): Client!
+  updateClient(
+    id: ID!
+    firstName: String
+    lastName: String
+    cellPhone: String
+    birthDay: DateTime
+  ): Client!
+  deleteClient(id: ID!): Client
+  signup(
+    email: String!
+    password: String!
+
+    name: String!
+    businessName: String!
+  ): User!
+  signin(email: String!, password: String!): User!
+  signout: SuccessMessage
+  requestReset(email: String!): SuccessMessage
+  resetPassword(
+    resetToken: String!
+    password: String!
+    confirmPassword: String!
+  ): User!
+  updatePermissions(permissions: [Permission], userId: ID!): User
+  addToCart(id: ID!): CartItem
+  removeFromCart(id: ID!): CartItem
+  createOrder(token: String!): Order!
+}
+
+type Query {
+  clients(
+    where: ClientWhereInput
+    orderBy: ClientOrderByInput
+    skip: Int
+    first: Int
+  ): [Client]!
+  client(where: ClientWhereUniqueInput!): Client
+  clientsConnection(where: ClientWhereInput): ClientConnection!
+  me: User
+  users: [User]!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  businessName: String!
+  permissions: [Permission!]!
+  cart: [CartItem!]!
+}
