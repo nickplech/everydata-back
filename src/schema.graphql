@@ -39,6 +39,7 @@ type Mutation {
   addToCart(id: ID!): CartItem
   removeFromCart(id: ID!): CartItem
   createOrder(token: String!): Order!
+  changeDay(id: ID!): Day!
 }
 
 type Query {
@@ -52,6 +53,7 @@ type Query {
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
   users: [User]!
+  day(where: DayWhereUniqueInput): Day!
 }
 
 type User {
@@ -61,4 +63,13 @@ type User {
   businessName: String!
   permissions: [Permission!]!
   cart: [CartItem!]!
+}
+
+type Day {
+  id: ID!
+  date: DateTime!
+  dayStart: DateTime!
+  dayEnd: DateTime!
+  appointments: [Appointment!]!
+  user: User!
 }

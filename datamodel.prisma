@@ -31,17 +31,14 @@ type Client {
   birthDay: DateTime
   image: String
   user: User!
-  sentReminder: [TextReminder!]!
-  confirmedReminder: [TextReminder!]!
-  canceledReminder: [TextReminder!]!
 }
 
 type Appointment {
   id: ID! @unique
   reason: String!
   provider: String
-  date: DateTime!
-  time: DateTime!
+  date: Day!
+  TimeRange: TimeRange!
   length: Int!
   bookedBy: String
   note: String
@@ -49,13 +46,27 @@ type Appointment {
   user: User!
 }
 
-# type TimeRange {
+type TimeRange {
+  start: DateTime!
+  end: DateTime!
+  isInPast: Boolean!
+}
 
-# }
+type Day {
+  id: ID! @unique
+  dayStart: DateTime!
+  dayEnd: DateTime!
+  date: DateTime! @unique
+  appointments: [Appointment!]!
+  user: User!
+}
 
 type TextReminder {
   id: ID! @unique
-  content: String!
+  from: String!
+  to: String!
+  text: String!
+  statusReportReq: Boolean
   date: DateTime
   time: DateTime
   name: String
@@ -64,6 +75,20 @@ type TextReminder {
   updatedAt: DateTime!
   user: User!
   client: Client!
+}
+
+type InboundMessage {
+  id: ID! @unique
+  msisdn: String!
+  to: String!
+  text: String!
+  type: String!
+  keyword: String!
+  messageTimeStamp: String!
+  user: User!
+  client: Client!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type CartItem {

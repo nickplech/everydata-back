@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Wed Jan 09 2019 05:58:14 GMT-0800 (PST)
+# timestamp: Tue Jan 15 2019 07:53:42 GMT-0800 (PST)
 
 type AggregateAppointment {
   count: Int!
@@ -14,6 +14,14 @@ type AggregateCartPackage {
 }
 
 type AggregateClient {
+  count: Int!
+}
+
+type AggregateDay {
+  count: Int!
+}
+
+type AggregateInboundMessage {
   count: Int!
 }
 
@@ -33,6 +41,10 @@ type AggregateTextReminder {
   count: Int!
 }
 
+type AggregateTimeRange {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -41,8 +53,8 @@ type Appointment implements Node {
   id: ID!
   reason: String!
   provider: String
-  date: DateTime!
-  time: DateTime!
+  date: Day!
+  TimeRange: TimeRange!
   length: Int!
   bookedBy: String
   note: String
@@ -63,13 +75,18 @@ type AppointmentConnection {
 input AppointmentCreateInput {
   reason: String!
   provider: String
-  date: DateTime!
-  time: DateTime!
   length: Int!
   bookedBy: String
   note: String
+  date: DayCreateOneWithoutAppointmentsInput!
+  TimeRange: TimeRangeCreateOneInput!
   client: ClientCreateOneInput!
   user: UserCreateOneWithoutAppointmentsInput!
+}
+
+input AppointmentCreateManyWithoutDateInput {
+  create: [AppointmentCreateWithoutDateInput!]
+  connect: [AppointmentWhereUniqueInput!]
 }
 
 input AppointmentCreateManyWithoutUserInput {
@@ -77,14 +94,25 @@ input AppointmentCreateManyWithoutUserInput {
   connect: [AppointmentWhereUniqueInput!]
 }
 
-input AppointmentCreateWithoutUserInput {
+input AppointmentCreateWithoutDateInput {
   reason: String!
   provider: String
-  date: DateTime!
-  time: DateTime!
   length: Int!
   bookedBy: String
   note: String
+  TimeRange: TimeRangeCreateOneInput!
+  client: ClientCreateOneInput!
+  user: UserCreateOneWithoutAppointmentsInput!
+}
+
+input AppointmentCreateWithoutUserInput {
+  reason: String!
+  provider: String
+  length: Int!
+  bookedBy: String
+  note: String
+  date: DayCreateOneWithoutAppointmentsInput!
+  TimeRange: TimeRangeCreateOneInput!
   client: ClientCreateOneInput!
 }
 
@@ -104,10 +132,6 @@ enum AppointmentOrderByInput {
   reason_DESC
   provider_ASC
   provider_DESC
-  date_ASC
-  date_DESC
-  time_ASC
-  time_DESC
   length_ASC
   length_DESC
   bookedBy_ASC
@@ -124,8 +148,6 @@ type AppointmentPreviousValues {
   id: ID!
   reason: String!
   provider: String
-  date: DateTime!
-  time: DateTime!
   length: Int!
   bookedBy: String
   note: String
@@ -260,50 +282,6 @@ input AppointmentScalarWhereInput {
 
   """All values not ending with the given string."""
   provider_not_ends_with: String
-  date: DateTime
-
-  """All values that are not equal to given value."""
-  date_not: DateTime
-
-  """All values that are contained in given list."""
-  date_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  date_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  date_lt: DateTime
-
-  """All values less than or equal the given value."""
-  date_lte: DateTime
-
-  """All values greater than the given value."""
-  date_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  date_gte: DateTime
-  time: DateTime
-
-  """All values that are not equal to given value."""
-  time_not: DateTime
-
-  """All values that are contained in given list."""
-  time_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  time_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  time_lt: DateTime
-
-  """All values less than or equal the given value."""
-  time_lte: DateTime
-
-  """All values greater than the given value."""
-  time_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  time_gte: DateTime
   length: Int
 
   """All values that are not equal to given value."""
@@ -450,11 +428,11 @@ input AppointmentSubscriptionWhereInput {
 input AppointmentUpdateInput {
   reason: String
   provider: String
-  date: DateTime
-  time: DateTime
   length: Int
   bookedBy: String
   note: String
+  date: DayUpdateOneRequiredWithoutAppointmentsInput
+  TimeRange: TimeRangeUpdateOneRequiredInput
   client: ClientUpdateOneRequiredInput
   user: UserUpdateOneRequiredWithoutAppointmentsInput
 }
@@ -462,8 +440,6 @@ input AppointmentUpdateInput {
 input AppointmentUpdateManyDataInput {
   reason: String
   provider: String
-  date: DateTime
-  time: DateTime
   length: Int
   bookedBy: String
   note: String
@@ -472,11 +448,21 @@ input AppointmentUpdateManyDataInput {
 input AppointmentUpdateManyMutationInput {
   reason: String
   provider: String
-  date: DateTime
-  time: DateTime
   length: Int
   bookedBy: String
   note: String
+}
+
+input AppointmentUpdateManyWithoutDateInput {
+  create: [AppointmentCreateWithoutDateInput!]
+  connect: [AppointmentWhereUniqueInput!]
+  set: [AppointmentWhereUniqueInput!]
+  disconnect: [AppointmentWhereUniqueInput!]
+  delete: [AppointmentWhereUniqueInput!]
+  update: [AppointmentUpdateWithWhereUniqueWithoutDateInput!]
+  updateMany: [AppointmentUpdateManyWithWhereNestedInput!]
+  deleteMany: [AppointmentScalarWhereInput!]
+  upsert: [AppointmentUpsertWithWhereUniqueWithoutDateInput!]
 }
 
 input AppointmentUpdateManyWithoutUserInput {
@@ -496,20 +482,42 @@ input AppointmentUpdateManyWithWhereNestedInput {
   data: AppointmentUpdateManyDataInput!
 }
 
-input AppointmentUpdateWithoutUserDataInput {
+input AppointmentUpdateWithoutDateDataInput {
   reason: String
   provider: String
-  date: DateTime
-  time: DateTime
   length: Int
   bookedBy: String
   note: String
+  TimeRange: TimeRangeUpdateOneRequiredInput
   client: ClientUpdateOneRequiredInput
+  user: UserUpdateOneRequiredWithoutAppointmentsInput
+}
+
+input AppointmentUpdateWithoutUserDataInput {
+  reason: String
+  provider: String
+  length: Int
+  bookedBy: String
+  note: String
+  date: DayUpdateOneRequiredWithoutAppointmentsInput
+  TimeRange: TimeRangeUpdateOneRequiredInput
+  client: ClientUpdateOneRequiredInput
+}
+
+input AppointmentUpdateWithWhereUniqueWithoutDateInput {
+  where: AppointmentWhereUniqueInput!
+  data: AppointmentUpdateWithoutDateDataInput!
 }
 
 input AppointmentUpdateWithWhereUniqueWithoutUserInput {
   where: AppointmentWhereUniqueInput!
   data: AppointmentUpdateWithoutUserDataInput!
+}
+
+input AppointmentUpsertWithWhereUniqueWithoutDateInput {
+  where: AppointmentWhereUniqueInput!
+  update: AppointmentUpdateWithoutDateDataInput!
+  create: AppointmentCreateWithoutDateInput!
 }
 
 input AppointmentUpsertWithWhereUniqueWithoutUserInput {
@@ -647,50 +655,6 @@ input AppointmentWhereInput {
 
   """All values not ending with the given string."""
   provider_not_ends_with: String
-  date: DateTime
-
-  """All values that are not equal to given value."""
-  date_not: DateTime
-
-  """All values that are contained in given list."""
-  date_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  date_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  date_lt: DateTime
-
-  """All values less than or equal the given value."""
-  date_lte: DateTime
-
-  """All values greater than the given value."""
-  date_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  date_gte: DateTime
-  time: DateTime
-
-  """All values that are not equal to given value."""
-  time_not: DateTime
-
-  """All values that are contained in given list."""
-  time_in: [DateTime!]
-
-  """All values that are not contained in given list."""
-  time_not_in: [DateTime!]
-
-  """All values less than the given value."""
-  time_lt: DateTime
-
-  """All values less than or equal the given value."""
-  time_lte: DateTime
-
-  """All values greater than the given value."""
-  time_gt: DateTime
-
-  """All values greater than or equal the given value."""
-  time_gte: DateTime
   length: Int
 
   """All values that are not equal to given value."""
@@ -793,6 +757,8 @@ input AppointmentWhereInput {
 
   """All values not ending with the given string."""
   note_not_ends_with: String
+  date: DayWhereInput
+  TimeRange: TimeRangeWhereInput
   client: ClientWhereInput
   user: UserWhereInput
 }
@@ -1946,6 +1912,751 @@ input ClientWhereUniqueInput {
 
 scalar DateTime
 
+type Day implements Node {
+  id: ID!
+  dayStart: DateTime!
+  dayEnd: DateTime!
+  date: DateTime!
+  appointments(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Appointment!]
+  user: User!
+}
+
+"""A connection to a list of items."""
+type DayConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DayEdge]!
+  aggregate: AggregateDay!
+}
+
+input DayCreateInput {
+  dayStart: DateTime!
+  dayEnd: DateTime!
+  date: DateTime!
+  appointments: AppointmentCreateManyWithoutDateInput
+  user: UserCreateOneInput!
+}
+
+input DayCreateOneWithoutAppointmentsInput {
+  create: DayCreateWithoutAppointmentsInput
+  connect: DayWhereUniqueInput
+}
+
+input DayCreateWithoutAppointmentsInput {
+  dayStart: DateTime!
+  dayEnd: DateTime!
+  date: DateTime!
+  user: UserCreateOneInput!
+}
+
+"""An edge in a connection."""
+type DayEdge {
+  """The item at the end of the edge."""
+  node: Day!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum DayOrderByInput {
+  id_ASC
+  id_DESC
+  dayStart_ASC
+  dayStart_DESC
+  dayEnd_ASC
+  dayEnd_DESC
+  date_ASC
+  date_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type DayPreviousValues {
+  id: ID!
+  dayStart: DateTime!
+  dayEnd: DateTime!
+  date: DateTime!
+}
+
+type DaySubscriptionPayload {
+  mutation: MutationType!
+  node: Day
+  updatedFields: [String!]
+  previousValues: DayPreviousValues
+}
+
+input DaySubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [DaySubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [DaySubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [DaySubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: DayWhereInput
+}
+
+input DayUpdateInput {
+  dayStart: DateTime
+  dayEnd: DateTime
+  date: DateTime
+  appointments: AppointmentUpdateManyWithoutDateInput
+  user: UserUpdateOneRequiredInput
+}
+
+input DayUpdateManyMutationInput {
+  dayStart: DateTime
+  dayEnd: DateTime
+  date: DateTime
+}
+
+input DayUpdateOneRequiredWithoutAppointmentsInput {
+  create: DayCreateWithoutAppointmentsInput
+  connect: DayWhereUniqueInput
+  update: DayUpdateWithoutAppointmentsDataInput
+  upsert: DayUpsertWithoutAppointmentsInput
+}
+
+input DayUpdateWithoutAppointmentsDataInput {
+  dayStart: DateTime
+  dayEnd: DateTime
+  date: DateTime
+  user: UserUpdateOneRequiredInput
+}
+
+input DayUpsertWithoutAppointmentsInput {
+  update: DayUpdateWithoutAppointmentsDataInput!
+  create: DayCreateWithoutAppointmentsInput!
+}
+
+input DayWhereInput {
+  """Logical AND on all given filters."""
+  AND: [DayWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [DayWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [DayWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  dayStart: DateTime
+
+  """All values that are not equal to given value."""
+  dayStart_not: DateTime
+
+  """All values that are contained in given list."""
+  dayStart_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  dayStart_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  dayStart_lt: DateTime
+
+  """All values less than or equal the given value."""
+  dayStart_lte: DateTime
+
+  """All values greater than the given value."""
+  dayStart_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  dayStart_gte: DateTime
+  dayEnd: DateTime
+
+  """All values that are not equal to given value."""
+  dayEnd_not: DateTime
+
+  """All values that are contained in given list."""
+  dayEnd_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  dayEnd_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  dayEnd_lt: DateTime
+
+  """All values less than or equal the given value."""
+  dayEnd_lte: DateTime
+
+  """All values greater than the given value."""
+  dayEnd_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  dayEnd_gte: DateTime
+  date: DateTime
+
+  """All values that are not equal to given value."""
+  date_not: DateTime
+
+  """All values that are contained in given list."""
+  date_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  date_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  date_lt: DateTime
+
+  """All values less than or equal the given value."""
+  date_lte: DateTime
+
+  """All values greater than the given value."""
+  date_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  date_gte: DateTime
+  appointments_every: AppointmentWhereInput
+  appointments_some: AppointmentWhereInput
+  appointments_none: AppointmentWhereInput
+  user: UserWhereInput
+}
+
+input DayWhereUniqueInput {
+  id: ID
+  date: DateTime
+}
+
+type InboundMessage implements Node {
+  id: ID!
+  msisdn: String!
+  to: String!
+  text: String!
+  type: String!
+  keyword: String!
+  messageTimeStamp: String!
+  user: User!
+  client: Client!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A connection to a list of items."""
+type InboundMessageConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [InboundMessageEdge]!
+  aggregate: AggregateInboundMessage!
+}
+
+input InboundMessageCreateInput {
+  msisdn: String!
+  to: String!
+  text: String!
+  type: String!
+  keyword: String!
+  messageTimeStamp: String!
+  user: UserCreateOneInput!
+  client: ClientCreateOneInput!
+}
+
+"""An edge in a connection."""
+type InboundMessageEdge {
+  """The item at the end of the edge."""
+  node: InboundMessage!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum InboundMessageOrderByInput {
+  id_ASC
+  id_DESC
+  msisdn_ASC
+  msisdn_DESC
+  to_ASC
+  to_DESC
+  text_ASC
+  text_DESC
+  type_ASC
+  type_DESC
+  keyword_ASC
+  keyword_DESC
+  messageTimeStamp_ASC
+  messageTimeStamp_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type InboundMessagePreviousValues {
+  id: ID!
+  msisdn: String!
+  to: String!
+  text: String!
+  type: String!
+  keyword: String!
+  messageTimeStamp: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type InboundMessageSubscriptionPayload {
+  mutation: MutationType!
+  node: InboundMessage
+  updatedFields: [String!]
+  previousValues: InboundMessagePreviousValues
+}
+
+input InboundMessageSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [InboundMessageSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [InboundMessageSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [InboundMessageSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: InboundMessageWhereInput
+}
+
+input InboundMessageUpdateInput {
+  msisdn: String
+  to: String
+  text: String
+  type: String
+  keyword: String
+  messageTimeStamp: String
+  user: UserUpdateOneRequiredInput
+  client: ClientUpdateOneRequiredInput
+}
+
+input InboundMessageUpdateManyMutationInput {
+  msisdn: String
+  to: String
+  text: String
+  type: String
+  keyword: String
+  messageTimeStamp: String
+}
+
+input InboundMessageWhereInput {
+  """Logical AND on all given filters."""
+  AND: [InboundMessageWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [InboundMessageWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [InboundMessageWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  msisdn: String
+
+  """All values that are not equal to given value."""
+  msisdn_not: String
+
+  """All values that are contained in given list."""
+  msisdn_in: [String!]
+
+  """All values that are not contained in given list."""
+  msisdn_not_in: [String!]
+
+  """All values less than the given value."""
+  msisdn_lt: String
+
+  """All values less than or equal the given value."""
+  msisdn_lte: String
+
+  """All values greater than the given value."""
+  msisdn_gt: String
+
+  """All values greater than or equal the given value."""
+  msisdn_gte: String
+
+  """All values containing the given string."""
+  msisdn_contains: String
+
+  """All values not containing the given string."""
+  msisdn_not_contains: String
+
+  """All values starting with the given string."""
+  msisdn_starts_with: String
+
+  """All values not starting with the given string."""
+  msisdn_not_starts_with: String
+
+  """All values ending with the given string."""
+  msisdn_ends_with: String
+
+  """All values not ending with the given string."""
+  msisdn_not_ends_with: String
+  to: String
+
+  """All values that are not equal to given value."""
+  to_not: String
+
+  """All values that are contained in given list."""
+  to_in: [String!]
+
+  """All values that are not contained in given list."""
+  to_not_in: [String!]
+
+  """All values less than the given value."""
+  to_lt: String
+
+  """All values less than or equal the given value."""
+  to_lte: String
+
+  """All values greater than the given value."""
+  to_gt: String
+
+  """All values greater than or equal the given value."""
+  to_gte: String
+
+  """All values containing the given string."""
+  to_contains: String
+
+  """All values not containing the given string."""
+  to_not_contains: String
+
+  """All values starting with the given string."""
+  to_starts_with: String
+
+  """All values not starting with the given string."""
+  to_not_starts_with: String
+
+  """All values ending with the given string."""
+  to_ends_with: String
+
+  """All values not ending with the given string."""
+  to_not_ends_with: String
+  text: String
+
+  """All values that are not equal to given value."""
+  text_not: String
+
+  """All values that are contained in given list."""
+  text_in: [String!]
+
+  """All values that are not contained in given list."""
+  text_not_in: [String!]
+
+  """All values less than the given value."""
+  text_lt: String
+
+  """All values less than or equal the given value."""
+  text_lte: String
+
+  """All values greater than the given value."""
+  text_gt: String
+
+  """All values greater than or equal the given value."""
+  text_gte: String
+
+  """All values containing the given string."""
+  text_contains: String
+
+  """All values not containing the given string."""
+  text_not_contains: String
+
+  """All values starting with the given string."""
+  text_starts_with: String
+
+  """All values not starting with the given string."""
+  text_not_starts_with: String
+
+  """All values ending with the given string."""
+  text_ends_with: String
+
+  """All values not ending with the given string."""
+  text_not_ends_with: String
+  type: String
+
+  """All values that are not equal to given value."""
+  type_not: String
+
+  """All values that are contained in given list."""
+  type_in: [String!]
+
+  """All values that are not contained in given list."""
+  type_not_in: [String!]
+
+  """All values less than the given value."""
+  type_lt: String
+
+  """All values less than or equal the given value."""
+  type_lte: String
+
+  """All values greater than the given value."""
+  type_gt: String
+
+  """All values greater than or equal the given value."""
+  type_gte: String
+
+  """All values containing the given string."""
+  type_contains: String
+
+  """All values not containing the given string."""
+  type_not_contains: String
+
+  """All values starting with the given string."""
+  type_starts_with: String
+
+  """All values not starting with the given string."""
+  type_not_starts_with: String
+
+  """All values ending with the given string."""
+  type_ends_with: String
+
+  """All values not ending with the given string."""
+  type_not_ends_with: String
+  keyword: String
+
+  """All values that are not equal to given value."""
+  keyword_not: String
+
+  """All values that are contained in given list."""
+  keyword_in: [String!]
+
+  """All values that are not contained in given list."""
+  keyword_not_in: [String!]
+
+  """All values less than the given value."""
+  keyword_lt: String
+
+  """All values less than or equal the given value."""
+  keyword_lte: String
+
+  """All values greater than the given value."""
+  keyword_gt: String
+
+  """All values greater than or equal the given value."""
+  keyword_gte: String
+
+  """All values containing the given string."""
+  keyword_contains: String
+
+  """All values not containing the given string."""
+  keyword_not_contains: String
+
+  """All values starting with the given string."""
+  keyword_starts_with: String
+
+  """All values not starting with the given string."""
+  keyword_not_starts_with: String
+
+  """All values ending with the given string."""
+  keyword_ends_with: String
+
+  """All values not ending with the given string."""
+  keyword_not_ends_with: String
+  messageTimeStamp: String
+
+  """All values that are not equal to given value."""
+  messageTimeStamp_not: String
+
+  """All values that are contained in given list."""
+  messageTimeStamp_in: [String!]
+
+  """All values that are not contained in given list."""
+  messageTimeStamp_not_in: [String!]
+
+  """All values less than the given value."""
+  messageTimeStamp_lt: String
+
+  """All values less than or equal the given value."""
+  messageTimeStamp_lte: String
+
+  """All values greater than the given value."""
+  messageTimeStamp_gt: String
+
+  """All values greater than or equal the given value."""
+  messageTimeStamp_gte: String
+
+  """All values containing the given string."""
+  messageTimeStamp_contains: String
+
+  """All values not containing the given string."""
+  messageTimeStamp_not_contains: String
+
+  """All values starting with the given string."""
+  messageTimeStamp_starts_with: String
+
+  """All values not starting with the given string."""
+  messageTimeStamp_not_starts_with: String
+
+  """All values ending with the given string."""
+  messageTimeStamp_ends_with: String
+
+  """All values not ending with the given string."""
+  messageTimeStamp_not_ends_with: String
+  createdAt: DateTime
+
+  """All values that are not equal to given value."""
+  createdAt_not: DateTime
+
+  """All values that are contained in given list."""
+  createdAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  createdAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  createdAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  createdAt_lte: DateTime
+
+  """All values greater than the given value."""
+  createdAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+
+  """All values that are not equal to given value."""
+  updatedAt_not: DateTime
+
+  """All values that are contained in given list."""
+  updatedAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  updatedAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  updatedAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  updatedAt_lte: DateTime
+
+  """All values greater than the given value."""
+  updatedAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  updatedAt_gte: DateTime
+  user: UserWhereInput
+  client: ClientWhereInput
+}
+
+input InboundMessageWhereUniqueInput {
+  id: ID
+}
+
 """
 The `Long` scalar type represents non-fractional signed whole numeric values.
 Long can represent values between -(2^63) and 2^63 - 1.
@@ -1954,7 +2665,9 @@ scalar Long
 
 type Mutation {
   createAppointment(data: AppointmentCreateInput!): Appointment!
+  createDay(data: DayCreateInput!): Day!
   createTextReminder(data: TextReminderCreateInput!): TextReminder!
+  createInboundMessage(data: InboundMessageCreateInput!): InboundMessage!
   createCartItem(data: CartItemCreateInput!): CartItem!
   createCartPackage(data: CartPackageCreateInput!): CartPackage!
   createOrder(data: OrderCreateInput!): Order!
@@ -1962,8 +2675,11 @@ type Mutation {
   createPackage(data: PackageCreateInput!): Package!
   createClient(data: ClientCreateInput!): Client!
   createUser(data: UserCreateInput!): User!
+  createTimeRange(data: TimeRangeCreateInput!): TimeRange!
   updateAppointment(data: AppointmentUpdateInput!, where: AppointmentWhereUniqueInput!): Appointment
+  updateDay(data: DayUpdateInput!, where: DayWhereUniqueInput!): Day
   updateTextReminder(data: TextReminderUpdateInput!, where: TextReminderWhereUniqueInput!): TextReminder
+  updateInboundMessage(data: InboundMessageUpdateInput!, where: InboundMessageWhereUniqueInput!): InboundMessage
   updateCartItem(data: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem
   updateCartPackage(data: CartPackageUpdateInput!, where: CartPackageWhereUniqueInput!): CartPackage
   updateOrder(data: OrderUpdateInput!, where: OrderWhereUniqueInput!): Order
@@ -1972,7 +2688,9 @@ type Mutation {
   updateClient(data: ClientUpdateInput!, where: ClientWhereUniqueInput!): Client
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteAppointment(where: AppointmentWhereUniqueInput!): Appointment
+  deleteDay(where: DayWhereUniqueInput!): Day
   deleteTextReminder(where: TextReminderWhereUniqueInput!): TextReminder
+  deleteInboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
   deleteCartItem(where: CartItemWhereUniqueInput!): CartItem
   deleteCartPackage(where: CartPackageWhereUniqueInput!): CartPackage
   deleteOrder(where: OrderWhereUniqueInput!): Order
@@ -1981,7 +2699,9 @@ type Mutation {
   deleteClient(where: ClientWhereUniqueInput!): Client
   deleteUser(where: UserWhereUniqueInput!): User
   upsertAppointment(where: AppointmentWhereUniqueInput!, create: AppointmentCreateInput!, update: AppointmentUpdateInput!): Appointment!
+  upsertDay(where: DayWhereUniqueInput!, create: DayCreateInput!, update: DayUpdateInput!): Day!
   upsertTextReminder(where: TextReminderWhereUniqueInput!, create: TextReminderCreateInput!, update: TextReminderUpdateInput!): TextReminder!
+  upsertInboundMessage(where: InboundMessageWhereUniqueInput!, create: InboundMessageCreateInput!, update: InboundMessageUpdateInput!): InboundMessage!
   upsertCartItem(where: CartItemWhereUniqueInput!, create: CartItemCreateInput!, update: CartItemUpdateInput!): CartItem!
   upsertCartPackage(where: CartPackageWhereUniqueInput!, create: CartPackageCreateInput!, update: CartPackageUpdateInput!): CartPackage!
   upsertOrder(where: OrderWhereUniqueInput!, create: OrderCreateInput!, update: OrderUpdateInput!): Order!
@@ -1990,7 +2710,9 @@ type Mutation {
   upsertClient(where: ClientWhereUniqueInput!, create: ClientCreateInput!, update: ClientUpdateInput!): Client!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyAppointments(data: AppointmentUpdateManyMutationInput!, where: AppointmentWhereInput): BatchPayload!
+  updateManyDays(data: DayUpdateManyMutationInput!, where: DayWhereInput): BatchPayload!
   updateManyTextReminders(data: TextReminderUpdateManyMutationInput!, where: TextReminderWhereInput): BatchPayload!
+  updateManyInboundMessages(data: InboundMessageUpdateManyMutationInput!, where: InboundMessageWhereInput): BatchPayload!
   updateManyCartItems(data: CartItemUpdateManyMutationInput!, where: CartItemWhereInput): BatchPayload!
   updateManyCartPackages(data: CartPackageUpdateManyMutationInput!, where: CartPackageWhereInput): BatchPayload!
   updateManyOrders(data: OrderUpdateManyMutationInput!, where: OrderWhereInput): BatchPayload!
@@ -1998,8 +2720,11 @@ type Mutation {
   updateManyPackages(data: PackageUpdateManyMutationInput!, where: PackageWhereInput): BatchPayload!
   updateManyClients(data: ClientUpdateManyMutationInput!, where: ClientWhereInput): BatchPayload!
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
+  updateManyTimeRanges(data: TimeRangeUpdateManyMutationInput!, where: TimeRangeWhereInput): BatchPayload!
   deleteManyAppointments(where: AppointmentWhereInput): BatchPayload!
+  deleteManyDays(where: DayWhereInput): BatchPayload!
   deleteManyTextReminders(where: TextReminderWhereInput): BatchPayload!
+  deleteManyInboundMessages(where: InboundMessageWhereInput): BatchPayload!
   deleteManyCartItems(where: CartItemWhereInput): BatchPayload!
   deleteManyCartPackages(where: CartPackageWhereInput): BatchPayload!
   deleteManyOrders(where: OrderWhereInput): BatchPayload!
@@ -2007,6 +2732,7 @@ type Mutation {
   deleteManyPackages(where: PackageWhereInput): BatchPayload!
   deleteManyClients(where: ClientWhereInput): BatchPayload!
   deleteManyUsers(where: UserWhereInput): BatchPayload!
+  deleteManyTimeRanges(where: TimeRangeWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -3249,7 +3975,9 @@ enum Permission {
 
 type Query {
   appointments(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Appointment]!
+  days(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Day]!
   textReminders(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TextReminder]!
+  inboundMessages(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [InboundMessage]!
   cartItems(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartItem]!
   cartPackages(where: CartPackageWhereInput, orderBy: CartPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartPackage]!
   orders(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Order]!
@@ -3257,8 +3985,11 @@ type Query {
   packages(where: PackageWhereInput, orderBy: PackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Package]!
   clients(where: ClientWhereInput, orderBy: ClientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Client]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
+  timeRanges(where: TimeRangeWhereInput, orderBy: TimeRangeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TimeRange]!
   appointment(where: AppointmentWhereUniqueInput!): Appointment
+  day(where: DayWhereUniqueInput!): Day
   textReminder(where: TextReminderWhereUniqueInput!): TextReminder
+  inboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
   cartItem(where: CartItemWhereUniqueInput!): CartItem
   cartPackage(where: CartPackageWhereUniqueInput!): CartPackage
   order(where: OrderWhereUniqueInput!): Order
@@ -3267,7 +3998,9 @@ type Query {
   client(where: ClientWhereUniqueInput!): Client
   user(where: UserWhereUniqueInput!): User
   appointmentsConnection(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AppointmentConnection!
+  daysConnection(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DayConnection!
   textRemindersConnection(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TextReminderConnection!
+  inboundMessagesConnection(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InboundMessageConnection!
   cartItemsConnection(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CartItemConnection!
   cartPackagesConnection(where: CartPackageWhereInput, orderBy: CartPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CartPackageConnection!
   ordersConnection(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderConnection!
@@ -3275,6 +4008,7 @@ type Query {
   packagesConnection(where: PackageWhereInput, orderBy: PackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PackageConnection!
   clientsConnection(where: ClientWhereInput, orderBy: ClientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ClientConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  timeRangesConnection(where: TimeRangeWhereInput, orderBy: TimeRangeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TimeRangeConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -3285,7 +4019,9 @@ type Query {
 
 type Subscription {
   appointment(where: AppointmentSubscriptionWhereInput): AppointmentSubscriptionPayload
+  day(where: DaySubscriptionWhereInput): DaySubscriptionPayload
   textReminder(where: TextReminderSubscriptionWhereInput): TextReminderSubscriptionPayload
+  inboundMessage(where: InboundMessageSubscriptionWhereInput): InboundMessageSubscriptionPayload
   cartItem(where: CartItemSubscriptionWhereInput): CartItemSubscriptionPayload
   cartPackage(where: CartPackageSubscriptionWhereInput): CartPackageSubscriptionPayload
   order(where: OrderSubscriptionWhereInput): OrderSubscriptionPayload
@@ -3293,11 +4029,15 @@ type Subscription {
   package(where: PackageSubscriptionWhereInput): PackageSubscriptionPayload
   client(where: ClientSubscriptionWhereInput): ClientSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  timeRange(where: TimeRangeSubscriptionWhereInput): TimeRangeSubscriptionPayload
 }
 
 type TextReminder implements Node {
   id: ID!
-  content: String!
+  from: String!
+  to: String!
+  text: String!
+  statusReportReq: Boolean
   date: DateTime
   time: DateTime
   name: String
@@ -3319,7 +4059,10 @@ type TextReminderConnection {
 }
 
 input TextReminderCreateInput {
-  content: String!
+  from: String!
+  to: String!
+  text: String!
+  statusReportReq: Boolean
   date: DateTime
   time: DateTime
   name: String
@@ -3340,8 +4083,14 @@ type TextReminderEdge {
 enum TextReminderOrderByInput {
   id_ASC
   id_DESC
-  content_ASC
-  content_DESC
+  from_ASC
+  from_DESC
+  to_ASC
+  to_DESC
+  text_ASC
+  text_DESC
+  statusReportReq_ASC
+  statusReportReq_DESC
   date_ASC
   date_DESC
   time_ASC
@@ -3358,7 +4107,10 @@ enum TextReminderOrderByInput {
 
 type TextReminderPreviousValues {
   id: ID!
-  content: String!
+  from: String!
+  to: String!
+  text: String!
+  statusReportReq: Boolean
   date: DateTime
   time: DateTime
   name: String
@@ -3407,7 +4159,10 @@ input TextReminderSubscriptionWhereInput {
 }
 
 input TextReminderUpdateInput {
-  content: String
+  from: String
+  to: String
+  text: String
+  statusReportReq: Boolean
   date: DateTime
   time: DateTime
   name: String
@@ -3417,7 +4172,10 @@ input TextReminderUpdateInput {
 }
 
 input TextReminderUpdateManyMutationInput {
-  content: String
+  from: String
+  to: String
+  text: String
+  statusReportReq: Boolean
   date: DateTime
   time: DateTime
   name: String
@@ -3473,46 +4231,130 @@ input TextReminderWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
-  content: String
+  from: String
 
   """All values that are not equal to given value."""
-  content_not: String
+  from_not: String
 
   """All values that are contained in given list."""
-  content_in: [String!]
+  from_in: [String!]
 
   """All values that are not contained in given list."""
-  content_not_in: [String!]
+  from_not_in: [String!]
 
   """All values less than the given value."""
-  content_lt: String
+  from_lt: String
 
   """All values less than or equal the given value."""
-  content_lte: String
+  from_lte: String
 
   """All values greater than the given value."""
-  content_gt: String
+  from_gt: String
 
   """All values greater than or equal the given value."""
-  content_gte: String
+  from_gte: String
 
   """All values containing the given string."""
-  content_contains: String
+  from_contains: String
 
   """All values not containing the given string."""
-  content_not_contains: String
+  from_not_contains: String
 
   """All values starting with the given string."""
-  content_starts_with: String
+  from_starts_with: String
 
   """All values not starting with the given string."""
-  content_not_starts_with: String
+  from_not_starts_with: String
 
   """All values ending with the given string."""
-  content_ends_with: String
+  from_ends_with: String
 
   """All values not ending with the given string."""
-  content_not_ends_with: String
+  from_not_ends_with: String
+  to: String
+
+  """All values that are not equal to given value."""
+  to_not: String
+
+  """All values that are contained in given list."""
+  to_in: [String!]
+
+  """All values that are not contained in given list."""
+  to_not_in: [String!]
+
+  """All values less than the given value."""
+  to_lt: String
+
+  """All values less than or equal the given value."""
+  to_lte: String
+
+  """All values greater than the given value."""
+  to_gt: String
+
+  """All values greater than or equal the given value."""
+  to_gte: String
+
+  """All values containing the given string."""
+  to_contains: String
+
+  """All values not containing the given string."""
+  to_not_contains: String
+
+  """All values starting with the given string."""
+  to_starts_with: String
+
+  """All values not starting with the given string."""
+  to_not_starts_with: String
+
+  """All values ending with the given string."""
+  to_ends_with: String
+
+  """All values not ending with the given string."""
+  to_not_ends_with: String
+  text: String
+
+  """All values that are not equal to given value."""
+  text_not: String
+
+  """All values that are contained in given list."""
+  text_in: [String!]
+
+  """All values that are not contained in given list."""
+  text_not_in: [String!]
+
+  """All values less than the given value."""
+  text_lt: String
+
+  """All values less than or equal the given value."""
+  text_lte: String
+
+  """All values greater than the given value."""
+  text_gt: String
+
+  """All values greater than or equal the given value."""
+  text_gte: String
+
+  """All values containing the given string."""
+  text_contains: String
+
+  """All values not containing the given string."""
+  text_not_contains: String
+
+  """All values starting with the given string."""
+  text_starts_with: String
+
+  """All values not starting with the given string."""
+  text_not_starts_with: String
+
+  """All values ending with the given string."""
+  text_ends_with: String
+
+  """All values not ending with the given string."""
+  text_not_ends_with: String
+  statusReportReq: Boolean
+
+  """All values that are not equal to given value."""
+  statusReportReq_not: Boolean
   date: DateTime
 
   """All values that are not equal to given value."""
@@ -3687,6 +4529,183 @@ input TextReminderWhereInput {
 
 input TextReminderWhereUniqueInput {
   id: ID
+}
+
+type TimeRange {
+  start: DateTime!
+  end: DateTime!
+  isInPast: Boolean!
+}
+
+"""A connection to a list of items."""
+type TimeRangeConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [TimeRangeEdge]!
+  aggregate: AggregateTimeRange!
+}
+
+input TimeRangeCreateInput {
+  start: DateTime!
+  end: DateTime!
+  isInPast: Boolean!
+}
+
+input TimeRangeCreateOneInput {
+  create: TimeRangeCreateInput
+}
+
+"""An edge in a connection."""
+type TimeRangeEdge {
+  """The item at the end of the edge."""
+  node: TimeRange!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum TimeRangeOrderByInput {
+  start_ASC
+  start_DESC
+  end_ASC
+  end_DESC
+  isInPast_ASC
+  isInPast_DESC
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type TimeRangePreviousValues {
+  start: DateTime!
+  end: DateTime!
+  isInPast: Boolean!
+}
+
+type TimeRangeSubscriptionPayload {
+  mutation: MutationType!
+  node: TimeRange
+  updatedFields: [String!]
+  previousValues: TimeRangePreviousValues
+}
+
+input TimeRangeSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [TimeRangeSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [TimeRangeSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [TimeRangeSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: TimeRangeWhereInput
+}
+
+input TimeRangeUpdateDataInput {
+  start: DateTime
+  end: DateTime
+  isInPast: Boolean
+}
+
+input TimeRangeUpdateManyMutationInput {
+  start: DateTime
+  end: DateTime
+  isInPast: Boolean
+}
+
+input TimeRangeUpdateOneRequiredInput {
+  create: TimeRangeCreateInput
+  update: TimeRangeUpdateDataInput
+  upsert: TimeRangeUpsertNestedInput
+}
+
+input TimeRangeUpsertNestedInput {
+  update: TimeRangeUpdateDataInput!
+  create: TimeRangeCreateInput!
+}
+
+input TimeRangeWhereInput {
+  """Logical AND on all given filters."""
+  AND: [TimeRangeWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [TimeRangeWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [TimeRangeWhereInput!]
+  start: DateTime
+
+  """All values that are not equal to given value."""
+  start_not: DateTime
+
+  """All values that are contained in given list."""
+  start_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  start_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  start_lt: DateTime
+
+  """All values less than or equal the given value."""
+  start_lte: DateTime
+
+  """All values greater than the given value."""
+  start_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  start_gte: DateTime
+  end: DateTime
+
+  """All values that are not equal to given value."""
+  end_not: DateTime
+
+  """All values that are contained in given list."""
+  end_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  end_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  end_lt: DateTime
+
+  """All values less than or equal the given value."""
+  end_lte: DateTime
+
+  """All values greater than the given value."""
+  end_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  end_gte: DateTime
+  isInPast: Boolean
+
+  """All values that are not equal to given value."""
+  isInPast_not: Boolean
 }
 
 type User implements Node {
