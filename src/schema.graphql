@@ -49,10 +49,12 @@ type Query {
     skip: Int
     first: Int
   ): [Client]!
+
   client(where: ClientWhereUniqueInput!): Client
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
   users: [User]!
+  # order(id: ID!) Order
   day(where: DayWhereUniqueInput): Day!
 }
 

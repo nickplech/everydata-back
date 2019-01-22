@@ -35,14 +35,13 @@ type Client {
 
 type Appointment {
   id: ID! @unique
-  reason: String!
-  provider: String
+  reason: [String!]
+  provider: [String]
   date: Day!
   TimeRange: TimeRange!
-  length: Int!
   bookedBy: String
   note: String
-  client: Client!
+  client: [Client!]
   user: User!
 }
 
@@ -65,18 +64,22 @@ type TextReminder {
   id: ID! @unique
   from: String!
   to: String!
-  text: String!
+  textTemplate: TextTemplate!
   statusReportReq: Boolean
-  date: DateTime
-  time: DateTime
-  name: String
-  customVar: String
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
   client: Client!
 }
 
+type TextTemplate {
+  id: ID! @unique
+  name: String!
+  content: String!
+  customVariable: String
+  dateVariable: DateTime
+  timeVariable: DateTime
+}
 type InboundMessage {
   id: ID! @unique
   msisdn: String!
@@ -104,7 +107,7 @@ type Package {
   title: String!
   description: String!
   price: Int!
-  user: User!
+  user: User
   image: String!
   quantity: Int! @default(value: 1)
 }
