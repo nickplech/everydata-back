@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Mon Jan 21 2019 15:57:20 GMT-0800 (PST)
+# timestamp: Thu Jan 24 2019 04:42:08 GMT-0800 (PST)
 
 type AggregateAppointment {
   count: Int!
@@ -18,6 +18,10 @@ type AggregateClient {
 }
 
 type AggregateDay {
+  count: Int!
+}
+
+type AggregateHour {
   count: Int!
 }
 
@@ -2068,6 +2072,12 @@ input ClientWhereUniqueInput {
   cellPhone: String
 }
 
+enum ConfirmationStatus {
+  UNCONFIRMED
+  CONFIRMED
+  CANCELED
+}
+
 scalar DateTime
 
 type Day implements Node {
@@ -2336,6 +2346,207 @@ input DayWhereInput {
 input DayWhereUniqueInput {
   id: ID
   date: DateTime
+}
+
+type Hour implements Node {
+  id: ID!
+  date: DateTime!
+  time: DateTime!
+  user: User!
+}
+
+"""A connection to a list of items."""
+type HourConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [HourEdge]!
+  aggregate: AggregateHour!
+}
+
+input HourCreateInput {
+  date: DateTime!
+  time: DateTime!
+  user: UserCreateOneInput!
+}
+
+"""An edge in a connection."""
+type HourEdge {
+  """The item at the end of the edge."""
+  node: Hour!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum HourOrderByInput {
+  id_ASC
+  id_DESC
+  date_ASC
+  date_DESC
+  time_ASC
+  time_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type HourPreviousValues {
+  id: ID!
+  date: DateTime!
+  time: DateTime!
+}
+
+type HourSubscriptionPayload {
+  mutation: MutationType!
+  node: Hour
+  updatedFields: [String!]
+  previousValues: HourPreviousValues
+}
+
+input HourSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [HourSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [HourSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [HourSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: HourWhereInput
+}
+
+input HourUpdateInput {
+  date: DateTime
+  time: DateTime
+  user: UserUpdateOneRequiredInput
+}
+
+input HourUpdateManyMutationInput {
+  date: DateTime
+  time: DateTime
+}
+
+input HourWhereInput {
+  """Logical AND on all given filters."""
+  AND: [HourWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [HourWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [HourWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  date: DateTime
+
+  """All values that are not equal to given value."""
+  date_not: DateTime
+
+  """All values that are contained in given list."""
+  date_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  date_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  date_lt: DateTime
+
+  """All values less than or equal the given value."""
+  date_lte: DateTime
+
+  """All values greater than the given value."""
+  date_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  date_gte: DateTime
+  time: DateTime
+
+  """All values that are not equal to given value."""
+  time_not: DateTime
+
+  """All values that are contained in given list."""
+  time_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  time_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  time_lt: DateTime
+
+  """All values less than or equal the given value."""
+  time_lte: DateTime
+
+  """All values greater than the given value."""
+  time_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  time_gte: DateTime
+  user: UserWhereInput
+}
+
+input HourWhereUniqueInput {
+  id: ID
 }
 
 type InboundMessage implements Node {
@@ -2823,6 +3034,7 @@ scalar Long
 
 type Mutation {
   createAppointment(data: AppointmentCreateInput!): Appointment!
+  createHour(data: HourCreateInput!): Hour!
   createDay(data: DayCreateInput!): Day!
   createTextReminder(data: TextReminderCreateInput!): TextReminder!
   createInboundMessage(data: InboundMessageCreateInput!): InboundMessage!
@@ -2836,6 +3048,7 @@ type Mutation {
   createUser(data: UserCreateInput!): User!
   createTimeRange(data: TimeRangeCreateInput!): TimeRange!
   updateAppointment(data: AppointmentUpdateInput!, where: AppointmentWhereUniqueInput!): Appointment
+  updateHour(data: HourUpdateInput!, where: HourWhereUniqueInput!): Hour
   updateDay(data: DayUpdateInput!, where: DayWhereUniqueInput!): Day
   updateTextReminder(data: TextReminderUpdateInput!, where: TextReminderWhereUniqueInput!): TextReminder
   updateInboundMessage(data: InboundMessageUpdateInput!, where: InboundMessageWhereUniqueInput!): InboundMessage
@@ -2848,6 +3061,7 @@ type Mutation {
   updateClient(data: ClientUpdateInput!, where: ClientWhereUniqueInput!): Client
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteAppointment(where: AppointmentWhereUniqueInput!): Appointment
+  deleteHour(where: HourWhereUniqueInput!): Hour
   deleteDay(where: DayWhereUniqueInput!): Day
   deleteTextReminder(where: TextReminderWhereUniqueInput!): TextReminder
   deleteInboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
@@ -2860,6 +3074,7 @@ type Mutation {
   deleteClient(where: ClientWhereUniqueInput!): Client
   deleteUser(where: UserWhereUniqueInput!): User
   upsertAppointment(where: AppointmentWhereUniqueInput!, create: AppointmentCreateInput!, update: AppointmentUpdateInput!): Appointment!
+  upsertHour(where: HourWhereUniqueInput!, create: HourCreateInput!, update: HourUpdateInput!): Hour!
   upsertDay(where: DayWhereUniqueInput!, create: DayCreateInput!, update: DayUpdateInput!): Day!
   upsertTextReminder(where: TextReminderWhereUniqueInput!, create: TextReminderCreateInput!, update: TextReminderUpdateInput!): TextReminder!
   upsertInboundMessage(where: InboundMessageWhereUniqueInput!, create: InboundMessageCreateInput!, update: InboundMessageUpdateInput!): InboundMessage!
@@ -2872,6 +3087,7 @@ type Mutation {
   upsertClient(where: ClientWhereUniqueInput!, create: ClientCreateInput!, update: ClientUpdateInput!): Client!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   updateManyAppointments(data: AppointmentUpdateManyMutationInput!, where: AppointmentWhereInput): BatchPayload!
+  updateManyHours(data: HourUpdateManyMutationInput!, where: HourWhereInput): BatchPayload!
   updateManyDays(data: DayUpdateManyMutationInput!, where: DayWhereInput): BatchPayload!
   updateManyTextReminders(data: TextReminderUpdateManyMutationInput!, where: TextReminderWhereInput): BatchPayload!
   updateManyInboundMessages(data: InboundMessageUpdateManyMutationInput!, where: InboundMessageWhereInput): BatchPayload!
@@ -2885,6 +3101,7 @@ type Mutation {
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   updateManyTimeRanges(data: TimeRangeUpdateManyMutationInput!, where: TimeRangeWhereInput): BatchPayload!
   deleteManyAppointments(where: AppointmentWhereInput): BatchPayload!
+  deleteManyHours(where: HourWhereInput): BatchPayload!
   deleteManyDays(where: DayWhereInput): BatchPayload!
   deleteManyTextReminders(where: TextReminderWhereInput): BatchPayload!
   deleteManyInboundMessages(where: InboundMessageWhereInput): BatchPayload!
@@ -4139,6 +4356,7 @@ enum Permission {
 
 type Query {
   appointments(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Appointment]!
+  hours(where: HourWhereInput, orderBy: HourOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Hour]!
   days(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Day]!
   textReminders(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TextReminder]!
   inboundMessages(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [InboundMessage]!
@@ -4152,6 +4370,7 @@ type Query {
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   timeRanges(where: TimeRangeWhereInput, orderBy: TimeRangeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TimeRange]!
   appointment(where: AppointmentWhereUniqueInput!): Appointment
+  hour(where: HourWhereUniqueInput!): Hour
   day(where: DayWhereUniqueInput!): Day
   textReminder(where: TextReminderWhereUniqueInput!): TextReminder
   inboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
@@ -4164,6 +4383,7 @@ type Query {
   client(where: ClientWhereUniqueInput!): Client
   user(where: UserWhereUniqueInput!): User
   appointmentsConnection(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AppointmentConnection!
+  hoursConnection(where: HourWhereInput, orderBy: HourOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): HourConnection!
   daysConnection(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DayConnection!
   textRemindersConnection(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TextReminderConnection!
   inboundMessagesConnection(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InboundMessageConnection!
@@ -4186,6 +4406,7 @@ type Query {
 
 type Subscription {
   appointment(where: AppointmentSubscriptionWhereInput): AppointmentSubscriptionPayload
+  hour(where: HourSubscriptionWhereInput): HourSubscriptionPayload
   day(where: DaySubscriptionWhereInput): DaySubscriptionPayload
   textReminder(where: TextReminderSubscriptionWhereInput): TextReminderSubscriptionPayload
   inboundMessage(where: InboundMessageSubscriptionWhereInput): InboundMessageSubscriptionPayload
@@ -4206,6 +4427,7 @@ type TextReminder implements Node {
   to: String!
   textTemplate: TextTemplate!
   statusReportReq: Boolean
+  confirmationStatus: [ConfirmationStatus!]!
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
@@ -4222,10 +4444,15 @@ type TextReminderConnection {
   aggregate: AggregateTextReminder!
 }
 
+input TextReminderCreateconfirmationStatusInput {
+  set: [ConfirmationStatus!]
+}
+
 input TextReminderCreateInput {
   from: String!
   to: String!
   statusReportReq: Boolean
+  confirmationStatus: TextReminderCreateconfirmationStatusInput
   textTemplate: TextTemplateCreateOneInput!
   user: UserCreateOneInput!
   client: ClientCreateOneInput!
@@ -4260,6 +4487,7 @@ type TextReminderPreviousValues {
   from: String!
   to: String!
   statusReportReq: Boolean
+  confirmationStatus: [ConfirmationStatus!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -4303,10 +4531,15 @@ input TextReminderSubscriptionWhereInput {
   node: TextReminderWhereInput
 }
 
+input TextReminderUpdateconfirmationStatusInput {
+  set: [ConfirmationStatus!]
+}
+
 input TextReminderUpdateInput {
   from: String
   to: String
   statusReportReq: Boolean
+  confirmationStatus: TextReminderUpdateconfirmationStatusInput
   textTemplate: TextTemplateUpdateOneRequiredInput
   user: UserUpdateOneRequiredInput
   client: ClientUpdateOneRequiredInput
@@ -4316,6 +4549,7 @@ input TextReminderUpdateManyMutationInput {
   from: String
   to: String
   statusReportReq: Boolean
+  confirmationStatus: TextReminderUpdateconfirmationStatusInput
 }
 
 input TextReminderWhereInput {

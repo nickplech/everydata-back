@@ -269,28 +269,28 @@ const Mutations = {
       0,
     )
   },
-  async changeDay(parent, args, ctx, info) {
-    if (!ctx.request.userId) {
-      throw new Error('You must be logged in to do that!')
-    }
+  // async newDay(parent, args, ctx, info) {
+  //   if (!ctx.request.userId) {
+  //     throw new Error('You must be logged in to do that!')
+  //   }
 
-    const day = await ctx.db.mutation.changeDay(
-      {
-        data: {
-          user: {
-            connect: {
-              id: ctx.request.userId,
-            },
-          },
-          date: new Date(),
-          ...args,
-        },
-      },
-      info,
-    )
+  //   const day = await ctx.db.mutation.newDay(
+  //     {
+  //       data: {
+  //         user: {
+  //           connect: {
+  //             id: ctx.request.userId,
+  //           },
+  //         },
+  //         date: new Date(),
+  //         ...args,
+  //       },
+  //     },
+  //     info,
+  //   )
 
-    return day
-  },
+  //   return day
+  // },
 }
 
 module.exports = Mutations

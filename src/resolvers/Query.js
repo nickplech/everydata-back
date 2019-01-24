@@ -4,7 +4,7 @@ const Query = {
   clients: forwardTo('db'),
   client: forwardTo('db'),
   clientsConnection: forwardTo('db'),
-  day: forwardTo('db'),
+  // day: forwardTo('db'),
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       return null
