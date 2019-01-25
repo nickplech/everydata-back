@@ -10,6 +10,7 @@ const Mutations = {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do that!')
     }
+
     args.firstName =
       args.firstName.charAt(0).toUpperCase() + args.firstName.slice(1).trim()
     args.lastName =
@@ -31,6 +32,9 @@ const Mutations = {
     return client
   },
   updateClient(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!')
+    }
     const updates = { ...args }
     delete updates.id
     return ctx.db.mutation.updateClient(
@@ -65,14 +69,17 @@ const Mutations = {
   },
   async signup(parent, args, ctx, info) {
     args.email = args.email.toLowerCase()
-
+    if (args.password !== args.confirmPassword) {
+      throw new Error("Your Passwords don't match!")
+    }
     const password = await bcrypt.hash(args.password, 10)
     const user = await ctx.db.mutation.createUser(
       {
         data: {
-          ...args,
+          name: args.name,
+          businessName: args.businessName,
+          email: args.email,
           password,
-
           permissions: { set: ['USER'] },
         },
       },
@@ -269,28 +276,6 @@ const Mutations = {
       0,
     )
   },
-  // async newDay(parent, args, ctx, info) {
-  //   if (!ctx.request.userId) {
-  //     throw new Error('You must be logged in to do that!')
-  //   }
-
-  //   const day = await ctx.db.mutation.newDay(
-  //     {
-  //       data: {
-  //         user: {
-  //           connect: {
-  //             id: ctx.request.userId,
-  //           },
-  //         },
-  //         date: new Date(),
-  //         ...args,
-  //       },
-  //     },
-  //     info,
-  //   )
-
-  //   return day
-  // },
 }
 
 module.exports = Mutations
