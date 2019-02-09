@@ -4,6 +4,9 @@ enum Permission {
   CLIENTCREATE
   CLIENTUPDATE
   CLIENTDELETE
+  HIPAA
+  EXPRESS
+  STANDARD
   PERMISSIONUPDATE
 }
 
@@ -41,14 +44,35 @@ type Client {
 
 type Appointment {
   id: ID! @unique
-  reason: [String!]
+  reason: [Reason!]
   provider: [String]
-  date: Day!
-  TimeRange: TimeRange!
+  date: DateTime!
+  timeRange: TimeRange!
   bookedBy: String
   note: String
   client: [Client!]
   user: User!
+}
+
+type Reason {
+  id: ID! @unique
+  name: String!
+  description: String
+  provider: String
+  color: [Color]
+}
+
+enum Color {
+  BLUE
+  GREEN
+  YELLOW
+  BLACK
+  WHITE
+  ORANGE
+  PURPLE
+  RED
+  MAROON
+  LIGHTBLUE
 }
 
 type Hour {
@@ -59,8 +83,8 @@ type Hour {
 }
 
 type TimeRange {
-  start: DateTime!
-  end: DateTime!
+  start: Int!
+  end: Int!
   isInPast: Boolean!
 }
 
@@ -79,7 +103,7 @@ type TextReminder {
   to: String!
   textTemplate: TextTemplate!
   statusReportReq: Boolean
-  confirmationStatus: [ConfirmationStatus]
+  confirmationStatus: ConfirmationStatus
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
@@ -94,6 +118,7 @@ type TextTemplate {
   dateVariable: DateTime
   timeVariable: DateTime
 }
+
 type InboundMessage {
   id: ID! @unique
   msisdn: String!
@@ -123,7 +148,6 @@ type Package {
   price: Int!
   user: User
   image: String!
-  quantity: Int! @default(value: 1)
 }
 
 type CartPackage {

@@ -27,6 +27,12 @@ type Mutation {
     password: String!
     confirmPassword: String!
   ): User!
+  updateProfile(
+    id: ID!
+    name: String
+    businessName: String!
+    email: String!
+  ): User!
   signin(email: String!, password: String!): User!
   signout: SuccessMessage
   requestReset(email: String!): SuccessMessage
@@ -39,6 +45,16 @@ type Mutation {
   addToCart(id: ID!): CartItem
   removeFromCart(id: ID!): CartItem
   createOrder(token: String!): Order!
+  createAppointment(
+    reason: String!
+    provider: String
+    date: DateTime!
+    timeRange: Int!
+    bookedBy: String
+    note: String
+    client: String!
+    user: String!
+  ): Appointment!
 }
 
 type Query {
@@ -63,6 +79,7 @@ type User {
   businessName: String!
   permissions: [Permission!]!
   cart: [CartItem!]!
+  appointments: [Appointment!]!
 }
 
 # type Day {

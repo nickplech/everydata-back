@@ -92,6 +92,7 @@ const Mutations = {
     })
     return user
   },
+
   async signin(parent, { email, password }, ctx, info) {
     const user = await ctx.db.query.user({ where: { email } })
     if (!user) {
@@ -152,7 +153,7 @@ const Mutations = {
       throw 'This reset request is either invalid or expired!'
     }
     const password = await bcrypt.hash(args.password, 10)
-    const updateUser = await ctx.db.mutation.updateUser({
+    const updatedUser = await ctx.db.mutation.updateUser({
       where: { email: user.email },
       data: {
         password,
@@ -166,6 +167,26 @@ const Mutations = {
       maxAge: 100 * 60 * 60 * 24 * 1,
     })
     return updatedUser
+  },
+  async updateProfile(parent, args, ctx, info) {
+    if (!userId) throw new Error('Please Sign In')
+    const { userId } = ctx.request.query.user({
+      where: {
+        id: ctx.request.userId,
+      },
+    })
+    return ctx.db.mutation.updateUser(
+      {
+        data: {
+          userId: userId,
+          name: args.name,
+          businessName: args.businessName,
+          email: args.email,
+        },
+        where: { id: userId },
+      },
+      info,
+    )
   },
   async updatePermissions(parent, args, ctx, info) {
     if (!ctx.request.userId) {
@@ -183,6 +204,9 @@ const Mutations = {
     return ctx.db.mutation.updateUser(
       {
         data: {
+          name: args.name,
+          businessName: args.businessName,
+          email: args.email,
           permissions: {
             set: args.permissions,
           },
@@ -248,6 +272,27 @@ const Mutations = {
       },
       info,
     )
+  },
+  async createAppointment(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) throw new Error('Please Sign In')
+    const appointment = await ctx.db.mutation.createAppointment(
+      {
+        data: {
+          user: {
+            connect: {
+              id: ctx.request.userId,
+            },
+          },
+          client: {
+            connect: { id: args.id },
+          },
+          ...args,
+        },
+      },
+      info,
+    )
+    return appointment
   },
   async createOrder(parent, args, ctx, info) {
     const { userId } = ctx.request
