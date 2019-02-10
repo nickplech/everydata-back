@@ -90,6 +90,15 @@ const Mutations = {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 1,
     })
+
+    const mailRes = await transport.sendMail({
+      from: 'info@perfectdayreminders.com',
+      to: user.email,
+      subject: 'Perfect Day Reminders Free Trial',
+      html: makeANiceEmail(
+        `Welcome to Perfect Day Reminders! Enjoy your Free Trial for the next two weeks—we are confident you will find the software highly useful, easy to use and enjoyable! At the end of your free trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you.`,
+      ),
+    })
     return user
   },
 
@@ -107,6 +116,7 @@ const Mutations = {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 1,
     })
+
     return user
   },
   signout(parent, args, ctx, info) {
@@ -130,11 +140,11 @@ const Mutations = {
     const mailRes = await transport.sendMail({
       from: 'info@perfectdayreminders.com',
       to: user.email,
-      subject: 'Your Password Reset Token',
+      subject: 'Password Reset Token-Perfect Day Reminders',
       html: makeANiceEmail(
         `Your Password Reset Token is Here \n\n <a href="${
           process.env.FRONTEND_URL
-        }/reset?resetToken=${resetToken}">Click Here to Reset</a>`,
+        }/reset?resetToken=${resetToken}">Click to Reset</a>`,
       ),
     })
     return { message: 'Thanks!' }
