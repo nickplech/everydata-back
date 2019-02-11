@@ -1,5 +1,4 @@
 require('dotenv').config({ path: 'variables.env' })
-
 const Nexmo = require('nexmo')
 
 const nexmo = new Nexmo({
@@ -9,6 +8,6 @@ const nexmo = new Nexmo({
 
 const from = '19252646214'
 const to = '17145853857'
-const text = 'Hello from Nexmo'
+const text = 'Hello from Perfect Day Reminders'
 
 nexmo.message.sendSms(from, to, text)

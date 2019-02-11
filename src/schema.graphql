@@ -58,18 +58,18 @@ type Mutation {
 }
 
 type Query {
+  client(id: ID!): Client
   clients(
     where: ClientWhereInput
     orderBy: ClientOrderByInput
     skip: Int
     first: Int
   ): [Client]!
-
-  client(where: ClientWhereUniqueInput!): Client
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
   users: [User]!
   # order(id: ID!) Order
+  # orders(orderBy: OrderOrderByInput): [Order]!
 }
 
 type User {
@@ -79,6 +79,7 @@ type User {
   businessName: String!
   permissions: [Permission!]!
   cart: [CartItem!]!
+  subscription: [CartPackage!]!
   appointments: [Appointment!]!
 }
 

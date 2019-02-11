@@ -4,6 +4,7 @@ const { randomBytes } = require('crypto')
 const { promisify } = require('util')
 const { transport, makeANiceEmail } = require('../mail')
 const { hasPermission } = require('../utils')
+const stripe = require('../stripe')
 
 const Mutations = {
   async createClient(parent, args, ctx, info) {
@@ -306,7 +307,7 @@ const Mutations = {
   },
   async createOrder(parent, args, ctx, info) {
     const { userId } = ctx.request
-    if (!userId) throw new Error('Please Sign In')
+    if (!userId) throw new Error('Please Sign In to Complete this Order')
     const user = await ctx.db.query.user(
       { where: { id: userId } },
       `{
@@ -321,7 +322,7 @@ const Mutations = {
             price
             id
             description
-            image
+
           }
         }}`,
     )
@@ -330,6 +331,36 @@ const Mutations = {
         tally + cartPackage.package.price * cartPackage.quantity,
       0,
     )
+    console.log(`Going to charge for a total of ${amount}`)
+    const charge = await stripe.charges.create({
+      amount,
+      currency: 'USD',
+      source: args.token,
+    })
+    const orderPackages = user.cart.map(cartPackage => {
+      const orderPackage = {
+        ...cartPackage.package,
+        quantity: cartPackage.quantity,
+        user: { connect: { id: userId } },
+      }
+      delete orderPackage.id
+      return orderPackage
+    })
+    const order = await ctx.db.mutation.createOrder({
+      data: {
+        total: charge.amount,
+        charge: charge.id,
+        items: { create: orderPackages },
+        user: { connect: { id: userId } },
+      },
+    })
+    const cartPackageIds = user.subscription.map(cartPackage => cartPackage.id)
+    await ctx.db.mutation.deleteManyCartPackages({
+      where: {
+        id_in: cartPackageIds,
+      },
+    })
+    return order
   },
 }
 

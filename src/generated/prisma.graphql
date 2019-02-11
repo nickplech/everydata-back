@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Fri Feb 08 2019 18:46:20 GMT-0800 (PST)
+# timestamp: Sun Feb 10 2019 23:05:51 GMT-0800 (PST)
 
 type AggregateAppointment {
   count: Int!
@@ -3050,11 +3050,11 @@ Long can represent values between -(2^63) and 2^63 - 1.
 scalar Long
 
 type Mutation {
+  createCartItem(data: CartItemCreateInput!): CartItem!
   createHour(data: HourCreateInput!): Hour!
   createDay(data: DayCreateInput!): Day!
   createTextReminder(data: TextReminderCreateInput!): TextReminder!
   createInboundMessage(data: InboundMessageCreateInput!): InboundMessage!
-  createCartItem(data: CartItemCreateInput!): CartItem!
   createCartPackage(data: CartPackageCreateInput!): CartPackage!
   createOrder(data: OrderCreateInput!): Order!
   createOrderPackage(data: OrderPackageCreateInput!): OrderPackage!
@@ -3065,11 +3065,11 @@ type Mutation {
   createAppointment(data: AppointmentCreateInput!): Appointment!
   createUser(data: UserCreateInput!): User!
   createTimeRange(data: TimeRangeCreateInput!): TimeRange!
+  updateCartItem(data: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem
   updateHour(data: HourUpdateInput!, where: HourWhereUniqueInput!): Hour
   updateDay(data: DayUpdateInput!, where: DayWhereUniqueInput!): Day
   updateTextReminder(data: TextReminderUpdateInput!, where: TextReminderWhereUniqueInput!): TextReminder
   updateInboundMessage(data: InboundMessageUpdateInput!, where: InboundMessageWhereUniqueInput!): InboundMessage
-  updateCartItem(data: CartItemUpdateInput!, where: CartItemWhereUniqueInput!): CartItem
   updateCartPackage(data: CartPackageUpdateInput!, where: CartPackageWhereUniqueInput!): CartPackage
   updateOrder(data: OrderUpdateInput!, where: OrderWhereUniqueInput!): Order
   updateOrderPackage(data: OrderPackageUpdateInput!, where: OrderPackageWhereUniqueInput!): OrderPackage
@@ -3079,11 +3079,11 @@ type Mutation {
   updateClient(data: ClientUpdateInput!, where: ClientWhereUniqueInput!): Client
   updateAppointment(data: AppointmentUpdateInput!, where: AppointmentWhereUniqueInput!): Appointment
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  deleteCartItem(where: CartItemWhereUniqueInput!): CartItem
   deleteHour(where: HourWhereUniqueInput!): Hour
   deleteDay(where: DayWhereUniqueInput!): Day
   deleteTextReminder(where: TextReminderWhereUniqueInput!): TextReminder
   deleteInboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
-  deleteCartItem(where: CartItemWhereUniqueInput!): CartItem
   deleteCartPackage(where: CartPackageWhereUniqueInput!): CartPackage
   deleteOrder(where: OrderWhereUniqueInput!): Order
   deleteOrderPackage(where: OrderPackageWhereUniqueInput!): OrderPackage
@@ -3093,11 +3093,11 @@ type Mutation {
   deleteClient(where: ClientWhereUniqueInput!): Client
   deleteAppointment(where: AppointmentWhereUniqueInput!): Appointment
   deleteUser(where: UserWhereUniqueInput!): User
+  upsertCartItem(where: CartItemWhereUniqueInput!, create: CartItemCreateInput!, update: CartItemUpdateInput!): CartItem!
   upsertHour(where: HourWhereUniqueInput!, create: HourCreateInput!, update: HourUpdateInput!): Hour!
   upsertDay(where: DayWhereUniqueInput!, create: DayCreateInput!, update: DayUpdateInput!): Day!
   upsertTextReminder(where: TextReminderWhereUniqueInput!, create: TextReminderCreateInput!, update: TextReminderUpdateInput!): TextReminder!
   upsertInboundMessage(where: InboundMessageWhereUniqueInput!, create: InboundMessageCreateInput!, update: InboundMessageUpdateInput!): InboundMessage!
-  upsertCartItem(where: CartItemWhereUniqueInput!, create: CartItemCreateInput!, update: CartItemUpdateInput!): CartItem!
   upsertCartPackage(where: CartPackageWhereUniqueInput!, create: CartPackageCreateInput!, update: CartPackageUpdateInput!): CartPackage!
   upsertOrder(where: OrderWhereUniqueInput!, create: OrderCreateInput!, update: OrderUpdateInput!): Order!
   upsertOrderPackage(where: OrderPackageWhereUniqueInput!, create: OrderPackageCreateInput!, update: OrderPackageUpdateInput!): OrderPackage!
@@ -3107,11 +3107,11 @@ type Mutation {
   upsertClient(where: ClientWhereUniqueInput!, create: ClientCreateInput!, update: ClientUpdateInput!): Client!
   upsertAppointment(where: AppointmentWhereUniqueInput!, create: AppointmentCreateInput!, update: AppointmentUpdateInput!): Appointment!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  updateManyCartItems(data: CartItemUpdateManyMutationInput!, where: CartItemWhereInput): BatchPayload!
   updateManyHours(data: HourUpdateManyMutationInput!, where: HourWhereInput): BatchPayload!
   updateManyDays(data: DayUpdateManyMutationInput!, where: DayWhereInput): BatchPayload!
   updateManyTextReminders(data: TextReminderUpdateManyMutationInput!, where: TextReminderWhereInput): BatchPayload!
   updateManyInboundMessages(data: InboundMessageUpdateManyMutationInput!, where: InboundMessageWhereInput): BatchPayload!
-  updateManyCartItems(data: CartItemUpdateManyMutationInput!, where: CartItemWhereInput): BatchPayload!
   updateManyCartPackages(data: CartPackageUpdateManyMutationInput!, where: CartPackageWhereInput): BatchPayload!
   updateManyOrders(data: OrderUpdateManyMutationInput!, where: OrderWhereInput): BatchPayload!
   updateManyOrderPackages(data: OrderPackageUpdateManyMutationInput!, where: OrderPackageWhereInput): BatchPayload!
@@ -3122,11 +3122,11 @@ type Mutation {
   updateManyAppointments(data: AppointmentUpdateManyMutationInput!, where: AppointmentWhereInput): BatchPayload!
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   updateManyTimeRanges(data: TimeRangeUpdateManyMutationInput!, where: TimeRangeWhereInput): BatchPayload!
+  deleteManyCartItems(where: CartItemWhereInput): BatchPayload!
   deleteManyHours(where: HourWhereInput): BatchPayload!
   deleteManyDays(where: DayWhereInput): BatchPayload!
   deleteManyTextReminders(where: TextReminderWhereInput): BatchPayload!
   deleteManyInboundMessages(where: InboundMessageWhereInput): BatchPayload!
-  deleteManyCartItems(where: CartItemWhereInput): BatchPayload!
   deleteManyCartPackages(where: CartPackageWhereInput): BatchPayload!
   deleteManyOrders(where: OrderWhereInput): BatchPayload!
   deleteManyOrderPackages(where: OrderPackageWhereInput): BatchPayload!
@@ -3157,6 +3157,8 @@ type Order implements Node {
   total: Int!
   user: User!
   charge: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 """A connection to a list of items."""
@@ -3192,10 +3194,10 @@ enum OrderOrderByInput {
   total_DESC
   charge_ASC
   charge_DESC
-  updatedAt_ASC
-  updatedAt_DESC
   createdAt_ASC
   createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
 }
 
 type OrderPackage implements Node {
@@ -3809,6 +3811,8 @@ type OrderPreviousValues {
   id: ID!
   total: Int!
   charge: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type OrderSubscriptionPayload {
@@ -3973,6 +3977,50 @@ input OrderWhereInput {
 
   """All values not ending with the given string."""
   charge_not_ends_with: String
+  createdAt: DateTime
+
+  """All values that are not equal to given value."""
+  createdAt_not: DateTime
+
+  """All values that are contained in given list."""
+  createdAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  createdAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  createdAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  createdAt_lte: DateTime
+
+  """All values greater than the given value."""
+  createdAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+
+  """All values that are not equal to given value."""
+  updatedAt_not: DateTime
+
+  """All values that are contained in given list."""
+  updatedAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  updatedAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  updatedAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  updatedAt_lte: DateTime
+
+  """All values greater than the given value."""
+  updatedAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  updatedAt_gte: DateTime
   packages_every: OrderPackageWhereInput
   packages_some: OrderPackageWhereInput
   packages_none: OrderPackageWhereInput
@@ -3988,8 +4036,8 @@ type Package implements Node {
   title: String!
   description: String!
   price: Int!
-  user: User
-  image: String!
+  user: User!
+  image: String
 }
 
 """A connection to a list of items."""
@@ -4006,8 +4054,8 @@ input PackageCreateInput {
   title: String!
   description: String!
   price: Int!
-  image: String!
-  user: UserCreateOneInput
+  image: String
+  user: UserCreateOneInput!
 }
 
 input PackageCreateOneInput {
@@ -4046,7 +4094,7 @@ type PackagePreviousValues {
   title: String!
   description: String!
   price: Int!
-  image: String!
+  image: String
 }
 
 type PackageSubscriptionPayload {
@@ -4093,7 +4141,7 @@ input PackageUpdateDataInput {
   description: String
   price: Int
   image: String
-  user: UserUpdateOneInput
+  user: UserUpdateOneRequiredInput
 }
 
 input PackageUpdateInput {
@@ -4101,7 +4149,7 @@ input PackageUpdateInput {
   description: String
   price: Int
   image: String
-  user: UserUpdateOneInput
+  user: UserUpdateOneRequiredInput
 }
 
 input PackageUpdateManyMutationInput {
@@ -4351,11 +4399,11 @@ enum Permission {
 }
 
 type Query {
+  cartItems(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartItem]!
   hours(where: HourWhereInput, orderBy: HourOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Hour]!
   days(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Day]!
   textReminders(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TextReminder]!
   inboundMessages(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [InboundMessage]!
-  cartItems(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartItem]!
   cartPackages(where: CartPackageWhereInput, orderBy: CartPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartPackage]!
   orders(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Order]!
   orderPackages(where: OrderPackageWhereInput, orderBy: OrderPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [OrderPackage]!
@@ -4366,11 +4414,11 @@ type Query {
   appointments(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Appointment]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   timeRanges(where: TimeRangeWhereInput, orderBy: TimeRangeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TimeRange]!
+  cartItem(where: CartItemWhereUniqueInput!): CartItem
   hour(where: HourWhereUniqueInput!): Hour
   day(where: DayWhereUniqueInput!): Day
   textReminder(where: TextReminderWhereUniqueInput!): TextReminder
   inboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
-  cartItem(where: CartItemWhereUniqueInput!): CartItem
   cartPackage(where: CartPackageWhereUniqueInput!): CartPackage
   order(where: OrderWhereUniqueInput!): Order
   orderPackage(where: OrderPackageWhereUniqueInput!): OrderPackage
@@ -4380,11 +4428,11 @@ type Query {
   client(where: ClientWhereUniqueInput!): Client
   appointment(where: AppointmentWhereUniqueInput!): Appointment
   user(where: UserWhereUniqueInput!): User
+  cartItemsConnection(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CartItemConnection!
   hoursConnection(where: HourWhereInput, orderBy: HourOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): HourConnection!
   daysConnection(where: DayWhereInput, orderBy: DayOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DayConnection!
   textRemindersConnection(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TextReminderConnection!
   inboundMessagesConnection(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InboundMessageConnection!
-  cartItemsConnection(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CartItemConnection!
   cartPackagesConnection(where: CartPackageWhereInput, orderBy: CartPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CartPackageConnection!
   ordersConnection(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderConnection!
   orderPackagesConnection(where: OrderPackageWhereInput, orderBy: OrderPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderPackageConnection!
@@ -4915,11 +4963,11 @@ input ReasonWhereUniqueInput {
 }
 
 type Subscription {
+  cartItem(where: CartItemSubscriptionWhereInput): CartItemSubscriptionPayload
   hour(where: HourSubscriptionWhereInput): HourSubscriptionPayload
   day(where: DaySubscriptionWhereInput): DaySubscriptionPayload
   textReminder(where: TextReminderSubscriptionWhereInput): TextReminderSubscriptionPayload
   inboundMessage(where: InboundMessageSubscriptionWhereInput): InboundMessageSubscriptionPayload
-  cartItem(where: CartItemSubscriptionWhereInput): CartItemSubscriptionPayload
   cartPackage(where: CartPackageSubscriptionWhereInput): CartPackageSubscriptionPayload
   order(where: OrderSubscriptionWhereInput): OrderSubscriptionPayload
   orderPackage(where: OrderPackageSubscriptionWhereInput): OrderPackageSubscriptionPayload
@@ -6004,15 +6052,6 @@ input UserUpdateManyMutationInput {
   resetToken: String
   resetTokenExpiry: Float
   permissions: UserUpdatepermissionsInput
-}
-
-input UserUpdateOneInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
-  disconnect: Boolean
-  delete: Boolean
-  update: UserUpdateDataInput
-  upsert: UserUpsertNestedInput
 }
 
 input UserUpdateOneRequiredInput {

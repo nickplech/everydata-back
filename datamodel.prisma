@@ -42,6 +42,14 @@ type Client {
   user: User!
 }
 
+type CartItem {
+  id: ID! @unique
+  quantity: Int! @default(value: 1)
+  client: Client
+  user: User!
+  date: DateTime
+}
+
 type Appointment {
   id: ID! @unique
   reason: [Reason!]
@@ -133,21 +141,13 @@ type InboundMessage {
   updatedAt: DateTime!
 }
 
-type CartItem {
-  id: ID! @unique
-  quantity: Int! @default(value: 1)
-  client: Client
-  user: User!
-  date: DateTime
-}
-
 type Package {
   id: ID! @unique
   title: String!
   description: String!
   price: Int!
-  user: User
-  image: String!
+  user: User!
+  image: String
 }
 
 type CartPackage {
@@ -173,4 +173,6 @@ type Order {
   total: Int!
   user: User!
   charge: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }

@@ -1,10 +1,7 @@
 const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
 const Query = {
-  clients: forwardTo('db'),
-  client: forwardTo('db'),
   clientsConnection: forwardTo('db'),
-  // day: forwardTo('db'),
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       return null
@@ -15,6 +12,42 @@ const Query = {
       },
       info,
     )
+  },
+  async client(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('You must be signed in')
+    }
+    const client = await ctx.db.query.client(
+      {
+        where: { id: args.id },
+      },
+      info,
+    )
+    const ownsClient = client.user.id === userId
+    const hasPermission = ctx.request.user.permissions.some(permission =>
+      ['ADMIN', 'USER'].includes(permission),
+    )
+
+    if (!ownsClient && !hasPermission) {
+      return null
+    }
+    return client
+  },
+  async clients(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('you must be signed in!')
+    }
+    const clients = await ctx.db.query.clients(
+      {
+        where: {
+          user: { id: userId },
+        },
+      },
+      info,
+    )
+    return clients
   },
   async users(parent, args, ctx, info) {
     if (!ctx.request.userId) {
@@ -39,10 +72,24 @@ const Query = {
   //   const hasPermissionToSeeOrder = ctx.request.user.permissions.includes(
   //     'ADMIN',
   //   )
-  //   if (!ownsOrder || !hasPermission) {
-  //     throw new Error('You cant see this dude')
+  //   if (!ownsOrder || !hasPermissionToSeeOrder) {
+  //     throw new Error('You cant see this, cmon now...')
   //   }
   //   return order
+  // },
+  // async orders(parent, args, ctx, info) {
+  //   const { userId } = ctx.request
+  //   if (!userId) {
+  //     throw new Error('you must be signed in!')
+  //   }
+  //   return ctx.db.query.orders(
+  //     {
+  //       where: {
+  //         user: { id: userId },
+  //       },
+  //     },
+  //     info,
+  //   )
   // },
 }
 
