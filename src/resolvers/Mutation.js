@@ -11,11 +11,15 @@ const Mutations = {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do that!')
     }
-
     args.firstName =
       args.firstName.charAt(0).toUpperCase() + args.firstName.slice(1).trim()
     args.lastName =
       args.lastName.charAt(0).toUpperCase() + args.lastName.slice(1).trim()
+    const dateParts = args.birthDay.split('/')
+
+    const ISODate = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1]
+    const birthDate = new Date(ISODate).toISOString()
+    args.birthDay = birthDate
     const client = await ctx.db.mutation.createClient(
       {
         data: {
@@ -36,6 +40,10 @@ const Mutations = {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do that!')
     }
+    const dateParts = args.birthDay.split('/')
+    const ISODate = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1]
+    const birthDate = new Date(ISODate).toISOString()
+    args.birthDay = birthDate
     const updates = { ...args }
     delete updates.id
     return ctx.db.mutation.updateClient(
@@ -97,10 +105,32 @@ const Mutations = {
       to: user.email,
       subject: 'Perfect Day Reminders Free Trial',
       html: makeANiceEmail(
-        `Welcome to Perfect Day Reminders! Enjoy your Free Trial for the next two weeks—we are confident you will find the software highly useful, easy to use and enjoyable! At the end of your free trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you.`,
+        `Welcome to Perfect Day Reminders! Enjoy your Free Trial for the next two weeks—we are confident you will find the software highly useful, easy to use and enjoyable! At the end of your trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you.`,
       ),
     })
     return user
+  },
+  async updateUser(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) throw new Error('Please Sign In to Complete this Order')
+    const currentUser = await ctx.db.query.user(
+      {
+        where: {
+          id: ctx.request.userId,
+        },
+      },
+      info,
+    )
+    const updatedUser = await ctx.db.mutation.updateUser({
+      where: { id: currentUser.id },
+      data: {
+        name: args.name,
+        businessName: args.businessName,
+        email: args.email,
+      },
+    })
+
+    return updatedUser
   },
 
   async signin(parent, { email, password }, ctx, info) {
@@ -179,26 +209,7 @@ const Mutations = {
     })
     return updatedUser
   },
-  async updateProfile(parent, args, ctx, info) {
-    if (!userId) throw new Error('Please Sign In')
-    const { userId } = ctx.request.query.user({
-      where: {
-        id: ctx.request.userId,
-      },
-    })
-    return ctx.db.mutation.updateUser(
-      {
-        data: {
-          userId: userId,
-          name: args.name,
-          businessName: args.businessName,
-          email: args.email,
-        },
-        where: { id: userId },
-      },
-      info,
-    )
-  },
+
   async updatePermissions(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in!')
@@ -215,9 +226,6 @@ const Mutations = {
     return ctx.db.mutation.updateUser(
       {
         data: {
-          name: args.name,
-          businessName: args.businessName,
-          email: args.email,
           permissions: {
             set: args.permissions,
           },
@@ -229,6 +237,7 @@ const Mutations = {
       info,
     )
   },
+
   async addToCart(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
@@ -317,29 +326,39 @@ const Mutations = {
         subscription {
           id
           quantity
-          package {
-            title
-            price
-            id
-            description
-
+          plan
           }
-        }}`,
+        }`,
     )
-    const amount = user.subscription.reduce(
-      (tally, cartPackage) =>
-        tally + cartPackage.package.price * cartPackage.quantity,
-      0,
+
+    const customer = await stripe.customers.create(
+      {
+        data: {
+          user: { id: userId },
+        },
+        source: args.token,
+      },
+      function(err, customer) {
+        if (err) {
+          throw new Error(
+            'Sorry, no user id is available to create subscription',
+          )
+        }
+        return customer
+      },
     )
-    console.log(`Going to charge for a total of ${amount}`)
-    const charge = await stripe.charges.create({
-      amount,
-      currency: 'USD',
-      source: args.token,
+    const charge = await stripe.subscriptions.create({
+      customer: customer,
+      items: [
+        {
+          plan: 'plan_EW7xrpDzOE9d5I',
+        },
+      ],
     })
-    const orderPackages = user.cart.map(cartPackage => {
+
+    const orderPackages = user.subscription.map(cartPackage => {
       const orderPackage = {
-        ...cartPackage.package,
+        ...cartPackage,
         quantity: cartPackage.quantity,
         user: { connect: { id: userId } },
       }
@@ -350,7 +369,7 @@ const Mutations = {
       data: {
         total: charge.amount,
         charge: charge.id,
-        items: { create: orderPackages },
+        packages: { create: orderPackages },
         user: { connect: { id: userId } },
       },
     })

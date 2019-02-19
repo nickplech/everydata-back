@@ -18,6 +18,7 @@ type Mutation {
     lastName: String
     cellPhone: String
     birthDay: DateTime
+    image: String
   ): Client!
   deleteClient(id: ID!): Client
   signup(
@@ -27,12 +28,7 @@ type Mutation {
     password: String!
     confirmPassword: String!
   ): User!
-  updateProfile(
-    id: ID!
-    name: String
-    businessName: String!
-    email: String!
-  ): User!
+  updateUser(name: String, businessName: String, email: String, id: ID!): User!
   signin(email: String!, password: String!): User!
   signout: SuccessMessage
   requestReset(email: String!): SuccessMessage
@@ -44,7 +40,7 @@ type Mutation {
   updatePermissions(permissions: [Permission], userId: ID!): User
   addToCart(id: ID!): CartItem
   removeFromCart(id: ID!): CartItem
-  createOrder(token: String!): Order!
+  createOrder(token: String!, plan: String!): Order!
   createAppointment(
     reason: String!
     provider: String
@@ -68,8 +64,8 @@ type Query {
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
   users: [User]!
-  # order(id: ID!) Order
-  # orders(orderBy: OrderOrderByInput): [Order]!
+  order(id: ID!): Order
+  orders(orderBy: OrderOrderByInput): [Order]!
 }
 
 type User {
@@ -80,14 +76,6 @@ type User {
   permissions: [Permission!]!
   cart: [CartItem!]!
   subscription: [CartPackage!]!
+  orders: [OrderPackage]
   appointments: [Appointment!]!
 }
-
-# type Day {
-#   id: ID!
-#   date: DateTime!
-#   dayStart: DateTime!
-#   dayEnd: DateTime!
-#   appointments: [Appointment!]!
-#   user: User!
-# }

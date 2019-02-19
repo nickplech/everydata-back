@@ -87,7 +87,7 @@ type Hour {
   id: ID! @unique
   date: DateTime!
   time: DateTime!
-  user: User!
+  user: User
 }
 
 type TimeRange {
@@ -141,20 +141,15 @@ type InboundMessage {
   updatedAt: DateTime!
 }
 
-type Package {
+type CartPackage {
   id: ID! @unique
   title: String!
   description: String!
+  image: String!
   price: Int!
-  user: User!
-  image: String
-}
-
-type CartPackage {
-  id: ID! @unique
   quantity: Int! @default(value: 1)
-  user: User!
-  package: Package
+  plan: String!
+  user: User
 }
 
 type OrderPackage {
@@ -163,13 +158,13 @@ type OrderPackage {
   description: String!
   image: String!
   price: Int!
+  plan: String!
   quantity: Int! @default(value: 1)
-  user: User!
+  user: User
 }
-
 type Order {
   id: ID! @unique
-  packages: [OrderPackage!]!
+  packages: [CartPackage!]!
   total: Int!
   user: User!
   charge: String!
