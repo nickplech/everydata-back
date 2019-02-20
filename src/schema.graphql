@@ -41,6 +41,12 @@ type Mutation {
   addToCart(id: ID!): CartItem
   removeFromCart(id: ID!): CartItem
   createOrder(token: String!, plan: String!): Order!
+  createReason(
+    name: String!
+    description: String
+    provider: String
+    color: [Color]!
+  ): Reason
   createAppointment(
     reason: String!
     provider: String
@@ -49,7 +55,6 @@ type Mutation {
     bookedBy: String
     note: String
     client: String!
-    user: String!
   ): Appointment!
 }
 

@@ -66,10 +66,10 @@ const Mutations = {
 
     const ownsClient = client.user.id === ctx.request.userId
     const hasPermission = ctx.request.user.permissions.some(permission =>
-      ['ADMIN', 'CLIENTDELETE', 'USER'].includes(permission),
+      ['ADMIN', 'CLIENTDELETE'].includes(permission),
     )
 
-    if (!ownsClient && !hasPermission) {
+    if (!ownsClient && hasPermission) {
       throw new Error("You don't have permission to do that!")
     }
 
@@ -292,6 +292,28 @@ const Mutations = {
       },
       info,
     )
+  },
+  async createReason(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('You must be signed in')
+    }
+    args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1).trim()
+
+    const reason = await ctx.db.mutation.createReason(
+      {
+        data: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          ...args,
+        },
+      },
+      info,
+    )
+    return reason
   },
   async createAppointment(parent, args, ctx, info) {
     const { userId } = ctx.request
