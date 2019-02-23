@@ -130,7 +130,7 @@ type OrderPackage {
 type Order {
   id: ID! @unique
   plan: String!
-  total: Int!
+
   price: Int!
   user: User!
   charge: String!

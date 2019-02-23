@@ -349,35 +349,34 @@ const Mutations = {
     if (!userId) {
       throw new Error('You must be signed in')
     }
-
-    const customer = await stripe.customers.create(
+    const currentUser = await ctx.db.query.user(
       {
-        data: {
-          user: {
-            connect: {
-              id: ctx.request.userId,
-            },
-          },
+        where: {
+          id: ctx.request.userId,
         },
-        source: args.token,
       },
-
-      info,
+      `{ id, email, businessName, plan}`,
     )
+    const customer = await stripe.customers.create({
+      email: currentUser.email,
+      description: currentUser.businessName,
+      source: args.token,
+    })
+
     const charge = await stripe.subscriptions.create({
       customer: customer.id,
       items: [
         {
-          plan: args.plan,
+          plan: currentUser.plan,
         },
       ],
     })
 
     const order = await ctx.db.mutation.createOrder({
       data: {
-        total: args.price,
+        price: args.price,
         charge: charge.customer,
-        plan: args.plan,
+        plan: currentUser.plan,
         user: { connect: { id: userId } },
       },
     })

@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Fri Feb 22 2019 19:14:27 GMT-0800 (PST)
+# timestamp: Sat Feb 23 2019 02:26:46 GMT-0800 (PST)
 
 type AggregateAppointment {
   count: Int!
@@ -2358,7 +2358,6 @@ interface Node {
 type Order implements Node {
   id: ID!
   plan: String!
-  total: Int!
   price: Int!
   user: User!
   charge: String!
@@ -2378,7 +2377,6 @@ type OrderConnection {
 
 input OrderCreateInput {
   plan: String!
-  total: Int!
   price: Int!
   charge: String!
   user: UserCreateOneInput!
@@ -2398,8 +2396,6 @@ enum OrderOrderByInput {
   id_DESC
   plan_ASC
   plan_DESC
-  total_ASC
-  total_DESC
   price_ASC
   price_DESC
   charge_ASC
@@ -2802,7 +2798,6 @@ input OrderPackageWhereUniqueInput {
 type OrderPreviousValues {
   id: ID!
   plan: String!
-  total: Int!
   price: Int!
   charge: String!
   createdAt: DateTime!
@@ -2850,7 +2845,6 @@ input OrderSubscriptionWhereInput {
 
 input OrderUpdateInput {
   plan: String
-  total: Int
   price: Int
   charge: String
   user: UserUpdateOneRequiredInput
@@ -2858,7 +2852,6 @@ input OrderUpdateInput {
 
 input OrderUpdateManyMutationInput {
   plan: String
-  total: Int
   price: Int
   charge: String
 }
@@ -2952,28 +2945,6 @@ input OrderWhereInput {
 
   """All values not ending with the given string."""
   plan_not_ends_with: String
-  total: Int
-
-  """All values that are not equal to given value."""
-  total_not: Int
-
-  """All values that are contained in given list."""
-  total_in: [Int!]
-
-  """All values that are not contained in given list."""
-  total_not_in: [Int!]
-
-  """All values less than the given value."""
-  total_lt: Int
-
-  """All values less than or equal the given value."""
-  total_lte: Int
-
-  """All values greater than the given value."""
-  total_gt: Int
-
-  """All values greater than or equal the given value."""
-  total_gte: Int
   price: Int
 
   """All values that are not equal to given value."""

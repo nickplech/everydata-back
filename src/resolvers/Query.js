@@ -2,6 +2,7 @@ const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
 const Query = {
   clientsConnection: forwardTo('db'),
+
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       return null
@@ -81,7 +82,7 @@ const Query = {
     const hasPermissionToSeeOrder = ctx.request.user.permissions.includes(
       'ADMIN',
     )
-    if (!ownsOrder || !hasPermissionToSeeOrder) {
+    if (!ownsOrder) {
       throw new Error('You cant see this, cmon now...')
     }
     return order
@@ -101,6 +102,7 @@ const Query = {
     )
   },
   async reason(parent, args, ctx, info) {
+    const { userId } = ctx.request
     if (!ctx.request.userId) {
       throw new Error('You arent logged in')
     }
@@ -110,9 +112,7 @@ const Query = {
       },
       info,
     )
-
-    const ownsReason = reason.user.id === ctx.request.userId
-
+    const ownsReason = reason.user.id === userId
     if (!ownsReason) {
       null
     }
@@ -125,9 +125,7 @@ const Query = {
     }
     return ctx.db.query.reasons(
       {
-        where: {
-          user: { id: userId },
-        },
+        where: { user: { id: userId } },
       },
       info,
     )
