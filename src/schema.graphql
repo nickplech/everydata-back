@@ -22,13 +22,21 @@ type Mutation {
   ): Client!
   deleteClient(id: ID!): Client
   signup(
-    name: String!
+    firstName: String!
+    lastName: String!
+    cellPhone: String!
     businessName: String!
     email: String!
     password: String!
     confirmPassword: String!
+    plan: String!
   ): User!
-  updateUser(name: String, businessName: String, email: String, id: ID!): User!
+  updateUser(
+    cellPhone: String
+    businessName: String
+    email: String
+    id: ID!
+  ): User!
   signin(email: String!, password: String!): User!
   signout: SuccessMessage
   requestReset(email: String!): SuccessMessage
@@ -40,13 +48,13 @@ type Mutation {
   updatePermissions(permissions: [Permission], userId: ID!): User
   addToCart(id: ID!): CartItem
   removeFromCart(id: ID!): CartItem
-  createOrder(token: String!, plan: String!): Order!
+  createOrder(token: String!, plan: String!, price: Int!): Order!
   createReason(
     name: String!
     description: String
     provider: String
-    color: [Color]!
-  ): Reason
+    color: String!
+  ): Reason!
   createAppointment(
     reason: String!
     provider: String
@@ -66,6 +74,8 @@ type Query {
     skip: Int
     first: Int
   ): [Client]!
+  reason(id: ID!): Reason
+  reasons(orderBy: ReasonOrderByInput): [Reason]!
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
   users: [User]!
@@ -75,12 +85,14 @@ type Query {
 
 type User {
   id: ID!
-  name: String!
+  firstName: String!
+  lastName: String!
+  cellPhone: String!
   email: String!
   businessName: String!
   permissions: [Permission!]!
   cart: [CartItem!]!
-  subscription: [CartPackage!]!
-  orders: [OrderPackage]
+  plan: String!
+  orders: [Order]
   appointments: [Appointment!]!
 }

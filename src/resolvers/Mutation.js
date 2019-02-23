@@ -69,13 +69,14 @@ const Mutations = {
       ['ADMIN', 'CLIENTDELETE'].includes(permission),
     )
 
-    if (!ownsClient && hasPermission) {
+    if (!ownsClient && !hasPermission) {
       throw new Error("You don't have permission to do that!")
     }
 
     // 3. Delete it!
     return ctx.db.mutation.deleteClient({ where }, info)
   },
+
   async signup(parent, args, ctx, info) {
     args.email = args.email.toLowerCase()
     if (args.password !== args.confirmPassword) {
@@ -85,10 +86,13 @@ const Mutations = {
     const user = await ctx.db.mutation.createUser(
       {
         data: {
-          name: args.name,
+          firstName: args.firstName,
+          lastName: args.lastName,
+          cellPhone: args.cellPhone,
           businessName: args.businessName,
           email: args.email,
           password,
+          plan: args.plan,
           permissions: { set: ['USER'] },
         },
       },
@@ -105,11 +109,14 @@ const Mutations = {
       to: user.email,
       subject: 'Perfect Day Reminders Free Trial',
       html: makeANiceEmail(
-        `Welcome to Perfect Day Reminders! Enjoy your Free Trial for the next two weeks—we are confident you will find the software highly useful, easy to use and enjoyable! At the end of your trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you.`,
+        `Welcome to Perfect Day Reminders ${
+          user.firstName
+        }! Enjoy your Free Trial for the next two weeks—we are confident you will love our service, finding it easy to use and enjoyable! At the end of your trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you!`,
       ),
     })
     return user
   },
+
   async updateUser(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) throw new Error('Please Sign In to Complete this Order')
@@ -124,7 +131,7 @@ const Mutations = {
     const updatedUser = await ctx.db.mutation.updateUser({
       where: { id: currentUser.id },
       data: {
-        name: args.name,
+        cellPhone: args.cellPhone,
         businessName: args.businessName,
         email: args.email,
       },
@@ -298,7 +305,8 @@ const Mutations = {
     if (!userId) {
       throw new Error('You must be signed in')
     }
-    args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1).trim()
+
+    // args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1).trim()
 
     const reason = await ctx.db.mutation.createReason(
       {
@@ -338,67 +346,39 @@ const Mutations = {
   },
   async createOrder(parent, args, ctx, info) {
     const { userId } = ctx.request
-    if (!userId) throw new Error('Please Sign In to Complete this Order')
-    const user = await ctx.db.query.user(
-      { where: { id: userId } },
-      `{
-        id
-        name
-        email
-        subscription {
-          id
-          quantity
-          plan
-          }
-        }`,
-    )
+    if (!userId) {
+      throw new Error('You must be signed in')
+    }
 
     const customer = await stripe.customers.create(
       {
         data: {
-          user: { id: userId },
+          user: {
+            connect: {
+              id: ctx.request.userId,
+            },
+          },
         },
         source: args.token,
       },
-      function(err, customer) {
-        if (err) {
-          throw new Error(
-            'Sorry, no user id is available to create subscription',
-          )
-        }
-        return customer
-      },
+
+      info,
     )
     const charge = await stripe.subscriptions.create({
-      customer: customer,
+      customer: customer.id,
       items: [
         {
-          plan: 'plan_EW7xrpDzOE9d5I',
+          plan: args.plan,
         },
       ],
     })
 
-    const orderPackages = user.subscription.map(cartPackage => {
-      const orderPackage = {
-        ...cartPackage,
-        quantity: cartPackage.quantity,
-        user: { connect: { id: userId } },
-      }
-      delete orderPackage.id
-      return orderPackage
-    })
     const order = await ctx.db.mutation.createOrder({
       data: {
-        total: charge.amount,
-        charge: charge.id,
-        packages: { create: orderPackages },
+        total: args.price,
+        charge: charge.customer,
+        plan: args.plan,
         user: { connect: { id: userId } },
-      },
-    })
-    const cartPackageIds = user.subscription.map(cartPackage => cartPackage.id)
-    await ctx.db.mutation.deleteManyCartPackages({
-      where: {
-        id_in: cartPackageIds,
       },
     })
     return order

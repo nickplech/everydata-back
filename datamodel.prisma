@@ -18,7 +18,9 @@ enum ConfirmationStatus {
 
 type User {
   id: ID! @unique
-  name: String!
+  firstName: String!
+  lastName: String!
+  cellPhone: String! @unique
   email: String! @unique
   businessName: String!
   password: String!
@@ -27,7 +29,7 @@ type User {
   permissions: [Permission]
   appointments: [Appointment!]!
   cart: [CartItem!]!
-  subscription: [CartPackage!]!
+  plan: String!
 }
 
 type Client {
@@ -48,17 +50,18 @@ type CartItem {
   client: Client
   user: User!
   date: DateTime
+  confirmationStatus: ConfirmationStatus
 }
 
 type Appointment {
   id: ID! @unique
-  reason: [Reason!]
+  reason: [Reason!]!
   provider: [String]
   date: DateTime!
   timeRange: TimeRange!
   bookedBy: String
   note: String
-  client: [Client!]
+  client: [Client!]!
   user: User!
 }
 
@@ -67,43 +70,14 @@ type Reason {
   name: String!
   description: String
   provider: String
-  color: [Color]
+  color: String!
   user: User!
-}
-
-enum Color {
-  BLUE
-  GREEN
-  YELLOW
-  BLACK
-  WHITE
-  ORANGE
-  PURPLE
-  RED
-  MAROON
-  LIGHTBLUE
-}
-
-type Hour {
-  id: ID! @unique
-  date: DateTime!
-  time: DateTime!
-  user: User
 }
 
 type TimeRange {
   start: Int!
   end: Int!
   isInPast: Boolean!
-}
-
-type Day {
-  id: ID! @unique
-  dayStart: DateTime!
-  dayEnd: DateTime!
-  date: DateTime! @unique
-  appointments: [Appointment!]!
-  user: User!
 }
 
 type TextReminder {
@@ -142,17 +116,6 @@ type InboundMessage {
   updatedAt: DateTime!
 }
 
-type CartPackage {
-  id: ID! @unique
-  title: String!
-  description: String!
-  image: String!
-  price: Int!
-  quantity: Int! @default(value: 1)
-  plan: String!
-  user: User
-}
-
 type OrderPackage {
   id: ID! @unique
   title: String!
@@ -166,8 +129,9 @@ type OrderPackage {
 
 type Order {
   id: ID! @unique
-  packages: [CartPackage!]!
+  plan: String!
   total: Int!
+  price: Int!
   user: User!
   charge: String!
   createdAt: DateTime!
