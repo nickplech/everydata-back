@@ -118,7 +118,7 @@ const Query = {
     }
     return reason
   },
-  async reasons(parent, args, ctx, info) {
+  reasons(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
       throw new Error('you must be signed in!')
@@ -130,6 +130,19 @@ const Query = {
       info,
     )
   },
+  // async cartItems(parent, args, ctx, info) {
+  //   const userId = ctx.request.userId
+  //   if (!userId) {
+  //     throw new Error('Nope!')
+  //   }
+  //   const cartItem = await ctx.db.query.cartItems(
+  //     { where },
+  //     `{ id user { id } confirmationStatus {UNCONFIRMED}  }`,
+
+  //     info,
+  //   )
+  //   return cartItem
+  // },
 }
 
 module.exports = Query

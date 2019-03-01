@@ -46,12 +46,12 @@ type Mutation {
     confirmPassword: String!
   ): User!
   updatePermissions(permissions: [Permission], userId: ID!): User
-  addToCart(id: ID!): CartItem
+  addToCart(id: ID!, confirmationStatus: String!): CartItem
   removeFromCart(id: ID!): CartItem
   createOrder(token: String!, plan: String!, price: Int!): Order!
   createReason(
     name: String!
-    description: String
+    defaultLength: Int
     provider: String
     color: String!
   ): Reason!
@@ -75,9 +75,10 @@ type Query {
     first: Int
   ): [Client]!
   reason(id: ID!): Reason
-  reasons(where: ReasonWhereInput, orderBy: ReasonOrderByInput): [Reason]!
+  reasons(orderBy: ReasonOrderByInput): [Reason]!
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
+  # cartItems(id: ID!): [CartItems]
   users: [User]!
   order(id: ID!): Order
   orders(orderBy: OrderOrderByInput): [Order]!

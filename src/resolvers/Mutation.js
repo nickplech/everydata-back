@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const { randomBytes } = require('crypto')
 const { promisify } = require('util')
 const { transport, makeANiceEmail } = require('../mail')
+const { sanitizeDate } = require('../dateFunction')
 const { hasPermission } = require('../utils')
 const stripe = require('../stripe')
 
@@ -11,12 +12,14 @@ const Mutations = {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do that!')
     }
-    args.firstName =
-      args.firstName.charAt(0).toUpperCase() + args.firstName.slice(1).trim()
-    args.lastName =
-      args.lastName.charAt(0).toUpperCase() + args.lastName.slice(1).trim()
-    const dateParts = args.birthDay.split('/')
+    let name = args.firstName
+    let surName = args.lastName
+    name = name.charAt(0).toUpperCase() + name.slice(1).trim()
+    surName = surName.charAt(0).toUpperCase() + surName.slice(1).trim()
+    // let birthDay = args.birthDay
+    // birthDay = sanitizeDate(birthDay)
 
+    const dateParts = args.birthDay.split('/')
     const ISODate = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1]
     const birthDate = new Date(ISODate).toISOString()
     args.birthDay = birthDate
@@ -79,6 +82,13 @@ const Mutations = {
 
   async signup(parent, args, ctx, info) {
     args.email = args.email.toLowerCase()
+    const name = args.firstName
+    const surName = args.lastName
+    name = name.charAt(0).toUpperCase() + name.slice(1).trim()
+    surName = surName.charAt(0).toUpperCase() + surName.slice(1).trim()
+    if (args.password.length < 5) {
+      throw new Error('Your Password must contain at least 6 characters')
+    }
     if (args.password !== args.confirmPassword) {
       throw new Error("Your Passwords don't match!")
     }
@@ -123,7 +133,7 @@ const Mutations = {
     const currentUser = await ctx.db.query.user(
       {
         where: {
-          id: ctx.request.userId,
+          id: userId,
         },
       },
       info,
@@ -261,7 +271,7 @@ const Mutations = {
       return ctx.db.mutation.updateCartItem(
         {
           where: { id: existingCartItem.id },
-          data: { quantity: existingCartItem.quantity + 1 },
+          data: { confirmationStatus: args.confirmationStatus },
         },
         info,
       )
@@ -275,6 +285,7 @@ const Mutations = {
           client: {
             connect: { id: args.id },
           },
+          confirmationStatus: args.confirmationStatus,
         },
       },
       info,

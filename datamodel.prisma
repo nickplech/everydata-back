@@ -10,11 +10,11 @@ enum Permission {
   PERMISSIONUPDATE
 }
 
-enum ConfirmationStatus {
-  UNCONFIRMED
-  CONFIRMED
-  CANCELED
-}
+# enum ConfirmationStatus {
+#   UNCONFIRMED
+#   CONFIRMED
+#   CANCELED
+# }
 
 type User {
   id: ID! @unique
@@ -50,7 +50,7 @@ type CartItem {
   client: Client
   user: User!
   date: DateTime
-  confirmationStatus: ConfirmationStatus
+  confirmationStatus: String!
 }
 
 type Appointment {
@@ -65,10 +65,16 @@ type Appointment {
   user: User!
 }
 
+type WaitList {
+  id: ID! @unique
+  user: User!
+  client: [Client!]!
+}
+
 type Reason {
   id: ID! @unique
   name: String!
-  description: String
+  defaultLength: Int
   provider: String
   color: String!
   user: User!
@@ -86,7 +92,7 @@ type TextReminder {
   to: String!
   textTemplate: TextTemplate!
   statusReportReq: Boolean
-  confirmationStatus: ConfirmationStatus
+  confirmationStatus: String
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
@@ -130,7 +136,6 @@ type OrderPackage {
 type Order {
   id: ID! @unique
   plan: String!
-
   price: Int!
   user: User!
   charge: String!
