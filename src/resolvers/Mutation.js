@@ -82,8 +82,8 @@ const Mutations = {
 
   async signup(parent, args, ctx, info) {
     args.email = args.email.toLowerCase()
-    const name = args.firstName
-    const surName = args.lastName
+    let name = args.firstName
+    let surName = args.lastName
     name = name.charAt(0).toUpperCase() + name.slice(1).trim()
     surName = surName.charAt(0).toUpperCase() + surName.slice(1).trim()
     if (args.password.length < 5) {
@@ -317,7 +317,7 @@ const Mutations = {
       throw new Error('You must be signed in')
     }
 
-    // args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1).trim()
+    args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1)
 
     const reason = await ctx.db.mutation.createReason(
       {
@@ -346,7 +346,7 @@ const Mutations = {
             },
           },
           client: {
-            connect: { id: args.id },
+            connect: { id: args.client },
           },
           ...args,
         },
@@ -363,7 +363,7 @@ const Mutations = {
     const currentUser = await ctx.db.query.user(
       {
         where: {
-          id: ctx.request.userId,
+          id: userId,
         },
       },
       `{ id, email, businessName, plan}`,

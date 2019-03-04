@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Wed Feb 27 2019 08:22:35 GMT-0800 (PST)
+# timestamp: Sat Mar 02 2019 00:41:31 GMT-0800 (PST)
 
 type AggregateAppointment {
   count: Int!
@@ -1032,7 +1032,7 @@ input ClientCreateInput {
   cellPhone: String!
   birthDay: DateTime
   image: String
-  user: UserCreateOneInput!
+  user: UserCreateOneWithoutClientsInput!
 }
 
 input ClientCreateManyInput {
@@ -1040,9 +1040,24 @@ input ClientCreateManyInput {
   connect: [ClientWhereUniqueInput!]
 }
 
+input ClientCreateManyWithoutUserInput {
+  create: [ClientCreateWithoutUserInput!]
+  connect: [ClientWhereUniqueInput!]
+}
+
 input ClientCreateOneInput {
   create: ClientCreateInput
   connect: ClientWhereUniqueInput
+}
+
+input ClientCreateWithoutUserInput {
+  firstName: String!
+  lastName: String!
+  dependantFirstName: String
+  dependantLastName: String
+  cellPhone: String!
+  birthDay: DateTime
+  image: String
 }
 
 """An edge in a connection."""
@@ -1448,7 +1463,7 @@ input ClientUpdateDataInput {
   cellPhone: String
   birthDay: DateTime
   image: String
-  user: UserUpdateOneRequiredInput
+  user: UserUpdateOneRequiredWithoutClientsInput
 }
 
 input ClientUpdateInput {
@@ -1459,7 +1474,7 @@ input ClientUpdateInput {
   cellPhone: String
   birthDay: DateTime
   image: String
-  user: UserUpdateOneRequiredInput
+  user: UserUpdateOneRequiredWithoutClientsInput
 }
 
 input ClientUpdateManyDataInput {
@@ -1494,6 +1509,18 @@ input ClientUpdateManyMutationInput {
   image: String
 }
 
+input ClientUpdateManyWithoutUserInput {
+  create: [ClientCreateWithoutUserInput!]
+  connect: [ClientWhereUniqueInput!]
+  set: [ClientWhereUniqueInput!]
+  disconnect: [ClientWhereUniqueInput!]
+  delete: [ClientWhereUniqueInput!]
+  update: [ClientUpdateWithWhereUniqueWithoutUserInput!]
+  updateMany: [ClientUpdateManyWithWhereNestedInput!]
+  deleteMany: [ClientScalarWhereInput!]
+  upsert: [ClientUpsertWithWhereUniqueWithoutUserInput!]
+}
+
 input ClientUpdateManyWithWhereNestedInput {
   where: ClientScalarWhereInput!
   data: ClientUpdateManyDataInput!
@@ -1515,9 +1542,24 @@ input ClientUpdateOneRequiredInput {
   upsert: ClientUpsertNestedInput
 }
 
+input ClientUpdateWithoutUserDataInput {
+  firstName: String
+  lastName: String
+  dependantFirstName: String
+  dependantLastName: String
+  cellPhone: String
+  birthDay: DateTime
+  image: String
+}
+
 input ClientUpdateWithWhereUniqueNestedInput {
   where: ClientWhereUniqueInput!
   data: ClientUpdateDataInput!
+}
+
+input ClientUpdateWithWhereUniqueWithoutUserInput {
+  where: ClientWhereUniqueInput!
+  data: ClientUpdateWithoutUserDataInput!
 }
 
 input ClientUpsertNestedInput {
@@ -1529,6 +1571,12 @@ input ClientUpsertWithWhereUniqueNestedInput {
   where: ClientWhereUniqueInput!
   update: ClientUpdateDataInput!
   create: ClientCreateInput!
+}
+
+input ClientUpsertWithWhereUniqueWithoutUserInput {
+  where: ClientWhereUniqueInput!
+  update: ClientUpdateWithoutUserDataInput!
+  create: ClientCreateWithoutUserInput!
 }
 
 input ClientWhereInput {
@@ -4662,6 +4710,7 @@ type User implements Node {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
+  clients(where: ClientWhereInput, orderBy: ClientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Client!]
   permissions: [Permission!]!
   appointments(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Appointment!]
   cart(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartItem!]
@@ -4689,6 +4738,7 @@ input UserCreateInput {
   resetTokenExpiry: Float
   plan: String!
   permissions: UserCreatepermissionsInput
+  clients: ClientCreateManyWithoutUserInput
   appointments: AppointmentCreateManyWithoutUserInput
   cart: CartItemCreateManyWithoutUserInput
 }
@@ -4708,6 +4758,11 @@ input UserCreateOneWithoutCartInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateOneWithoutClientsInput {
+  create: UserCreateWithoutClientsInput
+  connect: UserWhereUniqueInput
+}
+
 input UserCreatepermissionsInput {
   set: [Permission!]
 }
@@ -4723,6 +4778,7 @@ input UserCreateWithoutAppointmentsInput {
   resetTokenExpiry: Float
   plan: String!
   permissions: UserCreatepermissionsInput
+  clients: ClientCreateManyWithoutUserInput
   cart: CartItemCreateManyWithoutUserInput
 }
 
@@ -4737,7 +4793,23 @@ input UserCreateWithoutCartInput {
   resetTokenExpiry: Float
   plan: String!
   permissions: UserCreatepermissionsInput
+  clients: ClientCreateManyWithoutUserInput
   appointments: AppointmentCreateManyWithoutUserInput
+}
+
+input UserCreateWithoutClientsInput {
+  firstName: String!
+  lastName: String!
+  cellPhone: String!
+  email: String!
+  businessName: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: Float
+  plan: String!
+  permissions: UserCreatepermissionsInput
+  appointments: AppointmentCreateManyWithoutUserInput
+  cart: CartItemCreateManyWithoutUserInput
 }
 
 """An edge in a connection."""
@@ -4840,6 +4912,7 @@ input UserUpdateDataInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
+  clients: ClientUpdateManyWithoutUserInput
   appointments: AppointmentUpdateManyWithoutUserInput
   cart: CartItemUpdateManyWithoutUserInput
 }
@@ -4855,6 +4928,7 @@ input UserUpdateInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
+  clients: ClientUpdateManyWithoutUserInput
   appointments: AppointmentUpdateManyWithoutUserInput
   cart: CartItemUpdateManyWithoutUserInput
 }
@@ -4902,6 +4976,13 @@ input UserUpdateOneRequiredWithoutCartInput {
   upsert: UserUpsertWithoutCartInput
 }
 
+input UserUpdateOneRequiredWithoutClientsInput {
+  create: UserCreateWithoutClientsInput
+  connect: UserWhereUniqueInput
+  update: UserUpdateWithoutClientsDataInput
+  upsert: UserUpsertWithoutClientsInput
+}
+
 input UserUpdatepermissionsInput {
   set: [Permission!]
 }
@@ -4917,6 +4998,7 @@ input UserUpdateWithoutAppointmentsDataInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
+  clients: ClientUpdateManyWithoutUserInput
   cart: CartItemUpdateManyWithoutUserInput
 }
 
@@ -4931,7 +5013,23 @@ input UserUpdateWithoutCartDataInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
+  clients: ClientUpdateManyWithoutUserInput
   appointments: AppointmentUpdateManyWithoutUserInput
+}
+
+input UserUpdateWithoutClientsDataInput {
+  firstName: String
+  lastName: String
+  cellPhone: String
+  email: String
+  businessName: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: Float
+  plan: String
+  permissions: UserUpdatepermissionsInput
+  appointments: AppointmentUpdateManyWithoutUserInput
+  cart: CartItemUpdateManyWithoutUserInput
 }
 
 input UserUpsertNestedInput {
@@ -4947,6 +5045,11 @@ input UserUpsertWithoutAppointmentsInput {
 input UserUpsertWithoutCartInput {
   update: UserUpdateWithoutCartDataInput!
   create: UserCreateWithoutCartInput!
+}
+
+input UserUpsertWithoutClientsInput {
+  update: UserUpdateWithoutClientsDataInput!
+  create: UserCreateWithoutClientsInput!
 }
 
 input UserWhereInput {
@@ -5340,6 +5443,9 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   plan_not_ends_with: String
+  clients_every: ClientWhereInput
+  clients_some: ClientWhereInput
+  clients_none: ClientWhereInput
   appointments_every: AppointmentWhereInput
   appointments_some: AppointmentWhereInput
   appointments_none: AppointmentWhereInput

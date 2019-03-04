@@ -10,12 +10,6 @@ enum Permission {
   PERMISSIONUPDATE
 }
 
-# enum ConfirmationStatus {
-#   UNCONFIRMED
-#   CONFIRMED
-#   CANCELED
-# }
-
 type User {
   id: ID! @unique
   firstName: String!
@@ -26,6 +20,7 @@ type User {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
+  clients: [Client!]!
   permissions: [Permission]
   appointments: [Appointment!]!
   cart: [CartItem!]!

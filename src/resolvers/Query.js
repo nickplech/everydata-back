@@ -2,7 +2,6 @@ const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
 const Query = {
   clientsConnection: forwardTo('db'),
-
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       return null
@@ -48,7 +47,7 @@ const Query = {
       },
       info,
     )
-
+    // const ownsClient = clients.user.id === userId
     const hasPermission = ctx.request.user.permissions.some(permission =>
       ['ADMIN', 'USER'].includes(permission),
     )
@@ -58,12 +57,28 @@ const Query = {
     }
     return clients
   },
+  // async clientsConnection(parent, args, ctx, info) {
+  //   const { userId } = ctx.request
+  //   if (!userId) {
+  //     throw new Error('you must be signed in!')
+  //   }
+  //   const clients = await ctx.db.query.clients(
+  //     {
+  //       where: {
+  //         user: { id: userId },
+  //       },
+  //     },
+  //     info,
+  //     aggregate,
+  //   )
+  //   return clients
+  // },
   async users(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do this!')
     }
     console.log(ctx.request.userId)
-    hasPermission(ctx.request.user, ['ADMIN', 'USER', 'PERMISSIONUPDATE'])
+    hasPermission(ctx.request.user, ['ADMIN', 'PERMISSIONUPDATE'])
     return ctx.db.query.users({}, info)
   },
 
@@ -85,7 +100,9 @@ const Query = {
     if (!ownsOrder) {
       throw new Error('You cant see this, cmon now...')
     }
-    return order
+    if (ownsOrder || hasPermissionToSeeOrder) {
+      return order
+    }
   },
   async orders(parent, args, ctx, info) {
     const { userId } = ctx.request
@@ -112,37 +129,25 @@ const Query = {
       },
       info,
     )
-    const ownsReason = reason.user.id === userId
-    if (!ownsReason) {
-      null
-    }
+    // const ownsReason = reason.user.id === userId
+    // if (!ownsReason) {
+    //   null
+    // }
     return reason
   },
-  reasons(parent, args, ctx, info) {
+  async reasons(parent, args, ctx, info) {
     const { userId } = ctx.request
-    if (!userId) {
-      throw new Error('you must be signed in!')
-    }
-    return ctx.db.query.reasons(
+    // if (!userId) {
+    //   throw new Error('you must be signed in!')
+    // }
+    const reasons = await ctx.db.query.reasons(
       {
         where: { user: { id: userId } },
       },
       info,
     )
+    return reasons
   },
-  // async cartItems(parent, args, ctx, info) {
-  //   const userId = ctx.request.userId
-  //   if (!userId) {
-  //     throw new Error('Nope!')
-  //   }
-  //   const cartItem = await ctx.db.query.cartItems(
-  //     { where },
-  //     `{ id user { id } confirmationStatus {UNCONFIRMED}  }`,
-
-  //     info,
-  //   )
-  //   return cartItem
-  // },
 }
 
 module.exports = Query

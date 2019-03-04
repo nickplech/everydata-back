@@ -75,10 +75,9 @@ type Query {
     first: Int
   ): [Client]!
   reason(id: ID!): Reason
-  reasons(orderBy: ReasonOrderByInput): [Reason]!
+  reasons: [Reason]!
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
-  # cartItems(id: ID!): [CartItems]
   users: [User]!
   order(id: ID!): Order
   orders(orderBy: OrderOrderByInput): [Order]!
@@ -91,6 +90,7 @@ type User {
   cellPhone: String!
   email: String!
   businessName: String!
+  clients: [Client!]!
   permissions: [Permission!]!
   cart: [CartItem!]!
   plan: String!
