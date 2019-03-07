@@ -1,6 +1,8 @@
 const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
 const Query = {
+  reason: forwardTo('db'),
+  reasons: forwardTo('db'),
   clientsConnection: forwardTo('db'),
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {
@@ -57,22 +59,6 @@ const Query = {
     }
     return clients
   },
-  // async clientsConnection(parent, args, ctx, info) {
-  //   const { userId } = ctx.request
-  //   if (!userId) {
-  //     throw new Error('you must be signed in!')
-  //   }
-  //   const clients = await ctx.db.query.clients(
-  //     {
-  //       where: {
-  //         user: { id: userId },
-  //       },
-  //     },
-  //     info,
-  //     aggregate,
-  //   )
-  //   return clients
-  // },
   async users(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do this!')
@@ -118,36 +104,27 @@ const Query = {
       info,
     )
   },
-  async reason(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!ctx.request.userId) {
-      throw new Error('You arent logged in')
-    }
-    const reason = await ctx.db.query.reason(
-      {
-        where: { id: args.id },
-      },
-      info,
-    )
-    // const ownsReason = reason.user.id === userId
-    // if (!ownsReason) {
-    //   null
-    // }
-    return reason
-  },
-  async reasons(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    // if (!userId) {
-    //   throw new Error('you must be signed in!')
-    // }
-    const reasons = await ctx.db.query.reasons(
-      {
-        where: { user: { id: userId } },
-      },
-      info,
-    )
-    return reasons
-  },
+  // async reason(parent, args, ctx, info) {
+  //   const { userId } = ctx.request
+  //   if (!ctx.request.userId) {
+  //     throw new Error('You arent logged in')
+  //   }
+  //   const reason = await ctx.db.query.reason(
+  //     {
+  //       where: { id: args.id },
+  //     },
+  //     info,
+  //   )
+  //   const ownsReason = reason.user.id === userId
+  //   if (!ownsReason) {
+  //     null
+  //   }
+  //   return reason
+  // },
+  // async reasons(parent, args, ctx, info) {
+  //   const reasons = await ctx.db.query.reasons(info)
+  //   return reasons
+  // },
 }
 
 module.exports = Query

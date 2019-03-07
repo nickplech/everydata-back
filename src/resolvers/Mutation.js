@@ -86,8 +86,27 @@ const Mutations = {
     let surName = args.lastName
     name = name.charAt(0).toUpperCase() + name.slice(1).trim()
     surName = surName.charAt(0).toUpperCase() + surName.slice(1).trim()
+
+    if (!args.email.includes('@')) {
+      throw new Error('Please enter a valid email address')
+    }
+    if (!args.email.includes('.')) {
+      throw new Error('Please enter a valid email address')
+    }
     if (args.password.length < 5) {
       throw new Error('Your Password must contain at least 6 characters')
+    }
+    if (args.firstName < 1) {
+      throw new Error('Please enter your First Name')
+    }
+    if (args.lastName < 1) {
+      throw new Error('Please enter your Last Name')
+    }
+    if (args.cellPhone < 1) {
+      throw new Error('Please enter a complete cell phone number')
+    }
+    if (args.businessName < 1) {
+      throw new Error('Please enter a Business Name')
     }
     if (args.password !== args.confirmPassword) {
       throw new Error("Your Passwords don't match!")
@@ -129,7 +148,7 @@ const Mutations = {
 
   async updateUser(parent, args, ctx, info) {
     const { userId } = ctx.request
-    if (!userId) throw new Error('Please Sign In to Complete this Order')
+    if (!userId) throw new Error('Please Sign In to Complete this Update')
     const currentUser = await ctx.db.query.user(
       {
         where: {

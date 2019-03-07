@@ -75,7 +75,7 @@ type Query {
     first: Int
   ): [Client]!
   reason(id: ID!): Reason
-  reasons: [Reason]!
+  reasons(orderBy: ReasonOrderByInput): [Reason]
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
   users: [User]!
