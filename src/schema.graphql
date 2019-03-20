@@ -59,11 +59,18 @@ type Mutation {
     reason: String!
     provider: String
     date: DateTime!
-    timeRange: Int!
     bookedBy: String
     note: String
     client: String!
   ): Appointment!
+  createTextReminder(
+    to: String!
+    text: String!
+    client: ID!
+    user: ID!
+    confirmationStatus: String!
+  ): TextReminder!
+  deleteTextReminder(id: ID!): TextReminder
 }
 
 type Query {
@@ -74,6 +81,7 @@ type Query {
     skip: Int
     first: Int
   ): [Client]!
+  textTemplates: [TextTemplate]!
   reason(id: ID!): Reason
   reasons(orderBy: ReasonOrderByInput): [Reason]
   clientsConnection(where: ClientWhereInput): ClientConnection!
@@ -81,6 +89,7 @@ type Query {
   users: [User]!
   order(id: ID!): Order
   orders(orderBy: OrderOrderByInput): [Order]!
+  textReminders(client: ID!, orderBy: TextReminderOrderByInput): [TextReminder]!
 }
 
 type User {

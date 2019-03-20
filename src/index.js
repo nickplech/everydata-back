@@ -31,10 +31,6 @@ server.express.use(async (req, res, next) => {
   next()
 })
 
-// server.express.use(async (req, res, next) => {
-// const sendSms = await db.mutation.user
-// })
-
 server.start(
   {
     cors: {

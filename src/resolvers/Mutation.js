@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken')
 const { randomBytes } = require('crypto')
 const { promisify } = require('util')
 const { transport, makeANiceEmail } = require('../mail')
-const { sanitizeDate } = require('../dateFunction')
 const { hasPermission } = require('../utils')
 const stripe = require('../stripe')
+const { nexmo } = require('../send')
 
 const Mutations = {
   async createClient(parent, args, ctx, info) {
@@ -207,7 +207,7 @@ const Mutations = {
     const mailRes = await transport.sendMail({
       from: 'info@perfectdayreminders.com',
       to: user.email,
-      subject: 'Password Reset Token-Perfect Day Reminders',
+      subject: 'Password Reset-Perfect Day Reminders',
       html: makeANiceEmail(
         `Your Password Reset Token is Here \n\n <a href="${
           process.env.FRONTEND_URL
@@ -274,6 +274,144 @@ const Mutations = {
     )
   },
 
+  async createReason(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('You must be signed in')
+    }
+
+    args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1)
+
+    const reason = await ctx.db.mutation.createReason(
+      {
+        data: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+          ...args,
+        },
+      },
+      info,
+    )
+    return reason
+  },
+  async createAppointment(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) throw new Error('Please Sign In')
+    const appointment = await ctx.db.mutation.createAppointment(
+      {
+        data: {
+          user: {
+            connect: {
+              id: ctx.request.userId,
+            },
+          },
+          client: {
+            connect: { id: args.client },
+          },
+          reason: {
+            connect: { id: args.reason },
+          },
+          ...args,
+        },
+      },
+      info,
+    )
+    return appointment
+  },
+  async createOrder(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('You must be signed in')
+    }
+    const currentUser = await ctx.db.query.user(
+      {
+        where: {
+          id: userId,
+        },
+      },
+      `{ id, email, businessName, plan}`,
+    )
+    const customer = await stripe.customers.create({
+      email: currentUser.email,
+      description: currentUser.businessName,
+      source: args.token,
+    })
+
+    const charge = await stripe.subscriptions.create({
+      customer: customer.id,
+      items: [
+        {
+          plan: currentUser.plan,
+        },
+      ],
+    })
+
+    const order = await ctx.db.mutation.createOrder({
+      data: {
+        price: args.price,
+        charge: charge.customer,
+        plan: currentUser.plan,
+        user: { connect: { id: userId } },
+      },
+    })
+    return order
+  },
+  async createTextReminder(parent, args, ctx, info) {
+    const from = '19252646214'
+    let str = args.to
+    let to = str.replace(/[\D]/g, '')
+    to = '1' + to
+    console.log(to)
+    let text = args.text
+    const textReminder = await ctx.db.mutation.createTextReminder(
+      {
+        data: {
+          to,
+          from,
+          text,
+          user: {
+            connect: { id: args.user },
+          },
+          client: {
+            connect: { id: args.client },
+          },
+          confirmationStatus: { set: args.confirmationStatus },
+        },
+      },
+      info,
+    )
+
+    const res = await nexmo.message.sendSms(
+      from,
+      to,
+      text,
+      (err, responseData) => {
+        if (err) {
+          console.log(err)
+        } else {
+          console.log(responseData)
+        }
+      },
+    )
+
+    return textReminder
+  },
+  async deleteTextReminder(parent, args, ctx, info) {
+    const where = { id: args.id }
+
+    const hasPermission = ctx.request.user.permissions.some(permission =>
+      ['ADMIN'].includes(permission),
+    )
+
+    if (!hasPermission) {
+      throw new Error("You don't have permission to do that!")
+    }
+
+    return ctx.db.mutation.deleteTextReminder({ where }, info)
+  },
   async addToCart(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
@@ -329,88 +467,6 @@ const Mutations = {
       },
       info,
     )
-  },
-  async createReason(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!userId) {
-      throw new Error('You must be signed in')
-    }
-
-    args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1)
-
-    const reason = await ctx.db.mutation.createReason(
-      {
-        data: {
-          user: {
-            connect: {
-              id: userId,
-            },
-          },
-          ...args,
-        },
-      },
-      info,
-    )
-    return reason
-  },
-  async createAppointment(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!userId) throw new Error('Please Sign In')
-    const appointment = await ctx.db.mutation.createAppointment(
-      {
-        data: {
-          user: {
-            connect: {
-              id: ctx.request.userId,
-            },
-          },
-          client: {
-            connect: { id: args.client },
-          },
-          ...args,
-        },
-      },
-      info,
-    )
-    return appointment
-  },
-  async createOrder(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!userId) {
-      throw new Error('You must be signed in')
-    }
-    const currentUser = await ctx.db.query.user(
-      {
-        where: {
-          id: userId,
-        },
-      },
-      `{ id, email, businessName, plan}`,
-    )
-    const customer = await stripe.customers.create({
-      email: currentUser.email,
-      description: currentUser.businessName,
-      source: args.token,
-    })
-
-    const charge = await stripe.subscriptions.create({
-      customer: customer.id,
-      items: [
-        {
-          plan: currentUser.plan,
-        },
-      ],
-    })
-
-    const order = await ctx.db.mutation.createOrder({
-      data: {
-        price: args.price,
-        charge: charge.customer,
-        plan: currentUser.plan,
-        user: { connect: { id: userId } },
-      },
-    })
-    return order
   },
 }
 

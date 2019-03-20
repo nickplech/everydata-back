@@ -6,8 +6,4 @@ const nexmo = new Nexmo({
   apiSecret: process.env.NEXMO_SECRET,
 })
 
-const from = '19252646214'
-const to = '17145853857'
-const text = 'Hello from Perfect Day Reminders'
-
-nexmo.message.sendSms(from, to, text)
+exports.nexmo = nexmo

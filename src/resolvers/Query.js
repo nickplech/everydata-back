@@ -1,9 +1,8 @@
 const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
 const Query = {
-  reason: forwardTo('db'),
-  reasons: forwardTo('db'),
   clientsConnection: forwardTo('db'),
+  textTemplates: forwardTo('db'),
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       return null
@@ -36,28 +35,15 @@ const Query = {
     }
     return client
   },
-  clients(parent, args, ctx, info) {
+  async clients(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
       throw new Error('you must be signed in!')
     }
-    const clients = ctx.db.query.clients(
-      {
-        where: {
-          user: { id: userId },
-        },
-      },
+    return ctx.db.query.clients(
+      { where: { user: { id_contains: userId } } },
       info,
     )
-    // const ownsClient = clients.user.id === userId
-    const hasPermission = ctx.request.user.permissions.some(permission =>
-      ['ADMIN', 'USER'].includes(permission),
-    )
-
-    if (!hasPermission) {
-      return null
-    }
-    return clients
   },
   async users(parent, args, ctx, info) {
     if (!ctx.request.userId) {
@@ -104,27 +90,52 @@ const Query = {
       info,
     )
   },
-  // async reason(parent, args, ctx, info) {
-  //   const { userId } = ctx.request
-  //   if (!ctx.request.userId) {
-  //     throw new Error('You arent logged in')
-  //   }
-  //   const reason = await ctx.db.query.reason(
-  //     {
-  //       where: { id: args.id },
-  //     },
-  //     info,
-  //   )
-  //   const ownsReason = reason.user.id === userId
-  //   if (!ownsReason) {
-  //     null
-  //   }
-  //   return reason
-  // },
-  // async reasons(parent, args, ctx, info) {
-  //   const reasons = await ctx.db.query.reasons(info)
-  //   return reasons
-  // },
+  async reason(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('you must be signed in!')
+    }
+    const reason = await ctx.db.query.reason(
+      {
+        where: {
+          user: { id: userId },
+        },
+      },
+      info,
+    )
+    return reason
+  },
+  async reasons(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('you must be signed in!')
+    }
+    const reasons = await ctx.db.query.reasons(
+      {
+        where: {
+          user: { id: userId },
+        },
+      },
+      info,
+    )
+    return reasons
+  },
+  async textReminders(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('Please Login to query')
+    }
+    const textReminders = await ctx.db.query.textReminders(
+      {
+        where: {
+          user: { id: userId },
+          client: { id: args.client },
+        },
+      },
+      info,
+    )
+    return textReminders
+  },
 }
 
 module.exports = Query

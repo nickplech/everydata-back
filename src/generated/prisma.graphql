@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Sat Mar 02 2019 00:41:31 GMT-0800 (PST)
+# timestamp: Wed Mar 20 2019 07:08:06 GMT-0700 (PDT)
 
 type AggregateAppointment {
   count: Int!
@@ -54,7 +54,7 @@ type Appointment implements Node {
   reason(where: ReasonWhereInput, orderBy: ReasonOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Reason!]
   provider: [String!]!
   date: DateTime!
-  timeRange: TimeRange!
+  timeRange: TimeRange
   bookedBy: String
   note: String
   client(where: ClientWhereInput, orderBy: ClientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Client!]
@@ -72,12 +72,13 @@ type AppointmentConnection {
 }
 
 input AppointmentCreateInput {
+  id: ID
   date: DateTime!
   bookedBy: String
   note: String
   provider: AppointmentCreateproviderInput
   reason: ReasonCreateManyInput
-  timeRange: TimeRangeCreateOneInput!
+  timeRange: TimeRangeCreateOneInput
   client: ClientCreateManyInput
   user: UserCreateOneWithoutAppointmentsInput!
 }
@@ -92,12 +93,13 @@ input AppointmentCreateproviderInput {
 }
 
 input AppointmentCreateWithoutUserInput {
+  id: ID
   date: DateTime!
   bookedBy: String
   note: String
   provider: AppointmentCreateproviderInput
   reason: ReasonCreateManyInput
-  timeRange: TimeRangeCreateOneInput!
+  timeRange: TimeRangeCreateOneInput
   client: ClientCreateManyInput
 }
 
@@ -331,7 +333,7 @@ input AppointmentUpdateInput {
   note: String
   provider: AppointmentUpdateproviderInput
   reason: ReasonUpdateManyInput
-  timeRange: TimeRangeUpdateOneRequiredInput
+  timeRange: TimeRangeUpdateOneInput
   client: ClientUpdateManyInput
   user: UserUpdateOneRequiredWithoutAppointmentsInput
 }
@@ -377,7 +379,7 @@ input AppointmentUpdateWithoutUserDataInput {
   note: String
   provider: AppointmentUpdateproviderInput
   reason: ReasonUpdateManyInput
-  timeRange: TimeRangeUpdateOneRequiredInput
+  timeRange: TimeRangeUpdateOneInput
   client: ClientUpdateManyInput
 }
 
@@ -582,6 +584,7 @@ type CartItemConnection {
 }
 
 input CartItemCreateInput {
+  id: ID
   quantity: Int
   date: DateTime
   confirmationStatus: String!
@@ -595,6 +598,7 @@ input CartItemCreateManyWithoutUserInput {
 }
 
 input CartItemCreateWithoutUserInput {
+  id: ID
   quantity: Int
   date: DateTime
   confirmationStatus: String!
@@ -1025,6 +1029,7 @@ type ClientConnection {
 }
 
 input ClientCreateInput {
+  id: ID
   firstName: String!
   lastName: String!
   dependantFirstName: String
@@ -1032,7 +1037,7 @@ input ClientCreateInput {
   cellPhone: String!
   birthDay: DateTime
   image: String
-  user: UserCreateOneWithoutClientsInput!
+  user: UserCreateOneInput!
 }
 
 input ClientCreateManyInput {
@@ -1040,24 +1045,9 @@ input ClientCreateManyInput {
   connect: [ClientWhereUniqueInput!]
 }
 
-input ClientCreateManyWithoutUserInput {
-  create: [ClientCreateWithoutUserInput!]
-  connect: [ClientWhereUniqueInput!]
-}
-
 input ClientCreateOneInput {
   create: ClientCreateInput
   connect: ClientWhereUniqueInput
-}
-
-input ClientCreateWithoutUserInput {
-  firstName: String!
-  lastName: String!
-  dependantFirstName: String
-  dependantLastName: String
-  cellPhone: String!
-  birthDay: DateTime
-  image: String
 }
 
 """An edge in a connection."""
@@ -1463,7 +1453,7 @@ input ClientUpdateDataInput {
   cellPhone: String
   birthDay: DateTime
   image: String
-  user: UserUpdateOneRequiredWithoutClientsInput
+  user: UserUpdateOneRequiredInput
 }
 
 input ClientUpdateInput {
@@ -1474,7 +1464,7 @@ input ClientUpdateInput {
   cellPhone: String
   birthDay: DateTime
   image: String
-  user: UserUpdateOneRequiredWithoutClientsInput
+  user: UserUpdateOneRequiredInput
 }
 
 input ClientUpdateManyDataInput {
@@ -1509,18 +1499,6 @@ input ClientUpdateManyMutationInput {
   image: String
 }
 
-input ClientUpdateManyWithoutUserInput {
-  create: [ClientCreateWithoutUserInput!]
-  connect: [ClientWhereUniqueInput!]
-  set: [ClientWhereUniqueInput!]
-  disconnect: [ClientWhereUniqueInput!]
-  delete: [ClientWhereUniqueInput!]
-  update: [ClientUpdateWithWhereUniqueWithoutUserInput!]
-  updateMany: [ClientUpdateManyWithWhereNestedInput!]
-  deleteMany: [ClientScalarWhereInput!]
-  upsert: [ClientUpsertWithWhereUniqueWithoutUserInput!]
-}
-
 input ClientUpdateManyWithWhereNestedInput {
   where: ClientScalarWhereInput!
   data: ClientUpdateManyDataInput!
@@ -1542,24 +1520,9 @@ input ClientUpdateOneRequiredInput {
   upsert: ClientUpsertNestedInput
 }
 
-input ClientUpdateWithoutUserDataInput {
-  firstName: String
-  lastName: String
-  dependantFirstName: String
-  dependantLastName: String
-  cellPhone: String
-  birthDay: DateTime
-  image: String
-}
-
 input ClientUpdateWithWhereUniqueNestedInput {
   where: ClientWhereUniqueInput!
   data: ClientUpdateDataInput!
-}
-
-input ClientUpdateWithWhereUniqueWithoutUserInput {
-  where: ClientWhereUniqueInput!
-  data: ClientUpdateWithoutUserDataInput!
 }
 
 input ClientUpsertNestedInput {
@@ -1571,12 +1534,6 @@ input ClientUpsertWithWhereUniqueNestedInput {
   where: ClientWhereUniqueInput!
   update: ClientUpdateDataInput!
   create: ClientCreateInput!
-}
-
-input ClientUpsertWithWhereUniqueWithoutUserInput {
-  where: ClientWhereUniqueInput!
-  update: ClientUpdateWithoutUserDataInput!
-  create: ClientCreateWithoutUserInput!
 }
 
 input ClientWhereInput {
@@ -1925,6 +1882,7 @@ type InboundMessageConnection {
 }
 
 input InboundMessageCreateInput {
+  id: ID
   msisdn: String!
   to: String!
   text: String!
@@ -2388,11 +2346,11 @@ type Mutation {
   createAppointment(data: AppointmentCreateInput!): Appointment!
   createWaitList(data: WaitListCreateInput!): WaitList!
   createTextReminder(data: TextReminderCreateInput!): TextReminder!
+  createTextTemplate(data: TextTemplateCreateInput!): TextTemplate!
   createInboundMessage(data: InboundMessageCreateInput!): InboundMessage!
   createOrderPackage(data: OrderPackageCreateInput!): OrderPackage!
   createOrder(data: OrderCreateInput!): Order!
   createReason(data: ReasonCreateInput!): Reason!
-  createTextTemplate(data: TextTemplateCreateInput!): TextTemplate!
   createClient(data: ClientCreateInput!): Client!
   createUser(data: UserCreateInput!): User!
   createTimeRange(data: TimeRangeCreateInput!): TimeRange!
@@ -2400,43 +2358,46 @@ type Mutation {
   updateAppointment(data: AppointmentUpdateInput!, where: AppointmentWhereUniqueInput!): Appointment
   updateWaitList(data: WaitListUpdateInput!, where: WaitListWhereUniqueInput!): WaitList
   updateTextReminder(data: TextReminderUpdateInput!, where: TextReminderWhereUniqueInput!): TextReminder
+  updateTextTemplate(data: TextTemplateUpdateInput!, where: TextTemplateWhereUniqueInput!): TextTemplate
   updateInboundMessage(data: InboundMessageUpdateInput!, where: InboundMessageWhereUniqueInput!): InboundMessage
   updateOrderPackage(data: OrderPackageUpdateInput!, where: OrderPackageWhereUniqueInput!): OrderPackage
   updateOrder(data: OrderUpdateInput!, where: OrderWhereUniqueInput!): Order
   updateReason(data: ReasonUpdateInput!, where: ReasonWhereUniqueInput!): Reason
-  updateTextTemplate(data: TextTemplateUpdateInput!, where: TextTemplateWhereUniqueInput!): TextTemplate
   updateClient(data: ClientUpdateInput!, where: ClientWhereUniqueInput!): Client
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateTimeRange(data: TimeRangeUpdateInput!, where: TimeRangeWhereUniqueInput!): TimeRange
   deleteCartItem(where: CartItemWhereUniqueInput!): CartItem
   deleteAppointment(where: AppointmentWhereUniqueInput!): Appointment
   deleteWaitList(where: WaitListWhereUniqueInput!): WaitList
   deleteTextReminder(where: TextReminderWhereUniqueInput!): TextReminder
+  deleteTextTemplate(where: TextTemplateWhereUniqueInput!): TextTemplate
   deleteInboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
   deleteOrderPackage(where: OrderPackageWhereUniqueInput!): OrderPackage
   deleteOrder(where: OrderWhereUniqueInput!): Order
   deleteReason(where: ReasonWhereUniqueInput!): Reason
-  deleteTextTemplate(where: TextTemplateWhereUniqueInput!): TextTemplate
   deleteClient(where: ClientWhereUniqueInput!): Client
   deleteUser(where: UserWhereUniqueInput!): User
+  deleteTimeRange(where: TimeRangeWhereUniqueInput!): TimeRange
   upsertCartItem(where: CartItemWhereUniqueInput!, create: CartItemCreateInput!, update: CartItemUpdateInput!): CartItem!
   upsertAppointment(where: AppointmentWhereUniqueInput!, create: AppointmentCreateInput!, update: AppointmentUpdateInput!): Appointment!
   upsertWaitList(where: WaitListWhereUniqueInput!, create: WaitListCreateInput!, update: WaitListUpdateInput!): WaitList!
   upsertTextReminder(where: TextReminderWhereUniqueInput!, create: TextReminderCreateInput!, update: TextReminderUpdateInput!): TextReminder!
+  upsertTextTemplate(where: TextTemplateWhereUniqueInput!, create: TextTemplateCreateInput!, update: TextTemplateUpdateInput!): TextTemplate!
   upsertInboundMessage(where: InboundMessageWhereUniqueInput!, create: InboundMessageCreateInput!, update: InboundMessageUpdateInput!): InboundMessage!
   upsertOrderPackage(where: OrderPackageWhereUniqueInput!, create: OrderPackageCreateInput!, update: OrderPackageUpdateInput!): OrderPackage!
   upsertOrder(where: OrderWhereUniqueInput!, create: OrderCreateInput!, update: OrderUpdateInput!): Order!
   upsertReason(where: ReasonWhereUniqueInput!, create: ReasonCreateInput!, update: ReasonUpdateInput!): Reason!
-  upsertTextTemplate(where: TextTemplateWhereUniqueInput!, create: TextTemplateCreateInput!, update: TextTemplateUpdateInput!): TextTemplate!
   upsertClient(where: ClientWhereUniqueInput!, create: ClientCreateInput!, update: ClientUpdateInput!): Client!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  upsertTimeRange(where: TimeRangeWhereUniqueInput!, create: TimeRangeCreateInput!, update: TimeRangeUpdateInput!): TimeRange!
   updateManyCartItems(data: CartItemUpdateManyMutationInput!, where: CartItemWhereInput): BatchPayload!
   updateManyAppointments(data: AppointmentUpdateManyMutationInput!, where: AppointmentWhereInput): BatchPayload!
   updateManyTextReminders(data: TextReminderUpdateManyMutationInput!, where: TextReminderWhereInput): BatchPayload!
+  updateManyTextTemplates(data: TextTemplateUpdateManyMutationInput!, where: TextTemplateWhereInput): BatchPayload!
   updateManyInboundMessages(data: InboundMessageUpdateManyMutationInput!, where: InboundMessageWhereInput): BatchPayload!
   updateManyOrderPackages(data: OrderPackageUpdateManyMutationInput!, where: OrderPackageWhereInput): BatchPayload!
   updateManyOrders(data: OrderUpdateManyMutationInput!, where: OrderWhereInput): BatchPayload!
   updateManyReasons(data: ReasonUpdateManyMutationInput!, where: ReasonWhereInput): BatchPayload!
-  updateManyTextTemplates(data: TextTemplateUpdateManyMutationInput!, where: TextTemplateWhereInput): BatchPayload!
   updateManyClients(data: ClientUpdateManyMutationInput!, where: ClientWhereInput): BatchPayload!
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   updateManyTimeRanges(data: TimeRangeUpdateManyMutationInput!, where: TimeRangeWhereInput): BatchPayload!
@@ -2444,11 +2405,11 @@ type Mutation {
   deleteManyAppointments(where: AppointmentWhereInput): BatchPayload!
   deleteManyWaitLists(where: WaitListWhereInput): BatchPayload!
   deleteManyTextReminders(where: TextReminderWhereInput): BatchPayload!
+  deleteManyTextTemplates(where: TextTemplateWhereInput): BatchPayload!
   deleteManyInboundMessages(where: InboundMessageWhereInput): BatchPayload!
   deleteManyOrderPackages(where: OrderPackageWhereInput): BatchPayload!
   deleteManyOrders(where: OrderWhereInput): BatchPayload!
   deleteManyReasons(where: ReasonWhereInput): BatchPayload!
-  deleteManyTextTemplates(where: TextTemplateWhereInput): BatchPayload!
   deleteManyClients(where: ClientWhereInput): BatchPayload!
   deleteManyUsers(where: UserWhereInput): BatchPayload!
   deleteManyTimeRanges(where: TimeRangeWhereInput): BatchPayload!
@@ -2487,6 +2448,7 @@ type OrderConnection {
 }
 
 input OrderCreateInput {
+  id: ID
   plan: String!
   price: Int!
   charge: String!
@@ -2539,6 +2501,7 @@ type OrderPackageConnection {
 }
 
 input OrderPackageCreateInput {
+  id: ID
   title: String!
   description: String!
   image: String!
@@ -3201,11 +3164,11 @@ type Query {
   appointments(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Appointment]!
   waitLists(where: WaitListWhereInput, orderBy: WaitListOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [WaitList]!
   textReminders(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TextReminder]!
+  textTemplates(where: TextTemplateWhereInput, orderBy: TextTemplateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TextTemplate]!
   inboundMessages(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [InboundMessage]!
   orderPackages(where: OrderPackageWhereInput, orderBy: OrderPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [OrderPackage]!
   orders(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Order]!
   reasons(where: ReasonWhereInput, orderBy: ReasonOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Reason]!
-  textTemplates(where: TextTemplateWhereInput, orderBy: TextTemplateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TextTemplate]!
   clients(where: ClientWhereInput, orderBy: ClientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Client]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   timeRanges(where: TimeRangeWhereInput, orderBy: TimeRangeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [TimeRange]!
@@ -3213,22 +3176,23 @@ type Query {
   appointment(where: AppointmentWhereUniqueInput!): Appointment
   waitList(where: WaitListWhereUniqueInput!): WaitList
   textReminder(where: TextReminderWhereUniqueInput!): TextReminder
+  textTemplate(where: TextTemplateWhereUniqueInput!): TextTemplate
   inboundMessage(where: InboundMessageWhereUniqueInput!): InboundMessage
   orderPackage(where: OrderPackageWhereUniqueInput!): OrderPackage
   order(where: OrderWhereUniqueInput!): Order
   reason(where: ReasonWhereUniqueInput!): Reason
-  textTemplate(where: TextTemplateWhereUniqueInput!): TextTemplate
   client(where: ClientWhereUniqueInput!): Client
   user(where: UserWhereUniqueInput!): User
+  timeRange(where: TimeRangeWhereUniqueInput!): TimeRange
   cartItemsConnection(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CartItemConnection!
   appointmentsConnection(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AppointmentConnection!
   waitListsConnection(where: WaitListWhereInput, orderBy: WaitListOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): WaitListConnection!
   textRemindersConnection(where: TextReminderWhereInput, orderBy: TextReminderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TextReminderConnection!
+  textTemplatesConnection(where: TextTemplateWhereInput, orderBy: TextTemplateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TextTemplateConnection!
   inboundMessagesConnection(where: InboundMessageWhereInput, orderBy: InboundMessageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): InboundMessageConnection!
   orderPackagesConnection(where: OrderPackageWhereInput, orderBy: OrderPackageOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderPackageConnection!
   ordersConnection(where: OrderWhereInput, orderBy: OrderOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): OrderConnection!
   reasonsConnection(where: ReasonWhereInput, orderBy: ReasonOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ReasonConnection!
-  textTemplatesConnection(where: TextTemplateWhereInput, orderBy: TextTemplateOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TextTemplateConnection!
   clientsConnection(where: ClientWhereInput, orderBy: ClientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ClientConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   timeRangesConnection(where: TimeRangeWhereInput, orderBy: TimeRangeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): TimeRangeConnection!
@@ -3260,6 +3224,7 @@ type ReasonConnection {
 }
 
 input ReasonCreateInput {
+  id: ID
   name: String!
   defaultLength: Int
   provider: String
@@ -3799,11 +3764,11 @@ type Subscription {
   appointment(where: AppointmentSubscriptionWhereInput): AppointmentSubscriptionPayload
   waitList(where: WaitListSubscriptionWhereInput): WaitListSubscriptionPayload
   textReminder(where: TextReminderSubscriptionWhereInput): TextReminderSubscriptionPayload
+  textTemplate(where: TextTemplateSubscriptionWhereInput): TextTemplateSubscriptionPayload
   inboundMessage(where: InboundMessageSubscriptionWhereInput): InboundMessageSubscriptionPayload
   orderPackage(where: OrderPackageSubscriptionWhereInput): OrderPackageSubscriptionPayload
   order(where: OrderSubscriptionWhereInput): OrderSubscriptionPayload
   reason(where: ReasonSubscriptionWhereInput): ReasonSubscriptionPayload
-  textTemplate(where: TextTemplateSubscriptionWhereInput): TextTemplateSubscriptionPayload
   client(where: ClientSubscriptionWhereInput): ClientSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   timeRange(where: TimeRangeSubscriptionWhereInput): TimeRangeSubscriptionPayload
@@ -3813,7 +3778,7 @@ type TextReminder implements Node {
   id: ID!
   from: String!
   to: String!
-  textTemplate: TextTemplate!
+  text: String!
   statusReportReq: Boolean
   confirmationStatus: String
   createdAt: DateTime!
@@ -3833,11 +3798,12 @@ type TextReminderConnection {
 }
 
 input TextReminderCreateInput {
+  id: ID
   from: String!
   to: String!
+  text: String!
   statusReportReq: Boolean
   confirmationStatus: String
-  textTemplate: TextTemplateCreateOneInput!
   user: UserCreateOneInput!
   client: ClientCreateOneInput!
 }
@@ -3858,6 +3824,8 @@ enum TextReminderOrderByInput {
   from_DESC
   to_ASC
   to_DESC
+  text_ASC
+  text_DESC
   statusReportReq_ASC
   statusReportReq_DESC
   confirmationStatus_ASC
@@ -3872,6 +3840,7 @@ type TextReminderPreviousValues {
   id: ID!
   from: String!
   to: String!
+  text: String!
   statusReportReq: Boolean
   confirmationStatus: String
   createdAt: DateTime!
@@ -3920,9 +3889,9 @@ input TextReminderSubscriptionWhereInput {
 input TextReminderUpdateInput {
   from: String
   to: String
+  text: String
   statusReportReq: Boolean
   confirmationStatus: String
-  textTemplate: TextTemplateUpdateOneRequiredInput
   user: UserUpdateOneRequiredInput
   client: ClientUpdateOneRequiredInput
 }
@@ -3930,6 +3899,7 @@ input TextReminderUpdateInput {
 input TextReminderUpdateManyMutationInput {
   from: String
   to: String
+  text: String
   statusReportReq: Boolean
   confirmationStatus: String
 }
@@ -4063,6 +4033,46 @@ input TextReminderWhereInput {
 
   """All values not ending with the given string."""
   to_not_ends_with: String
+  text: String
+
+  """All values that are not equal to given value."""
+  text_not: String
+
+  """All values that are contained in given list."""
+  text_in: [String!]
+
+  """All values that are not contained in given list."""
+  text_not_in: [String!]
+
+  """All values less than the given value."""
+  text_lt: String
+
+  """All values less than or equal the given value."""
+  text_lte: String
+
+  """All values greater than the given value."""
+  text_gt: String
+
+  """All values greater than or equal the given value."""
+  text_gte: String
+
+  """All values containing the given string."""
+  text_contains: String
+
+  """All values not containing the given string."""
+  text_not_contains: String
+
+  """All values starting with the given string."""
+  text_starts_with: String
+
+  """All values not starting with the given string."""
+  text_not_starts_with: String
+
+  """All values ending with the given string."""
+  text_ends_with: String
+
+  """All values not ending with the given string."""
+  text_not_ends_with: String
   statusReportReq: Boolean
 
   """All values that are not equal to given value."""
@@ -4151,7 +4161,6 @@ input TextReminderWhereInput {
 
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
-  textTemplate: TextTemplateWhereInput
   user: UserWhereInput
   client: ClientWhereInput
 }
@@ -4180,16 +4189,12 @@ type TextTemplateConnection {
 }
 
 input TextTemplateCreateInput {
+  id: ID
   name: String!
   content: String!
   customVariable: String
   dateVariable: DateTime
   timeVariable: DateTime
-}
-
-input TextTemplateCreateOneInput {
-  create: TextTemplateCreateInput
-  connect: TextTemplateWhereUniqueInput
 }
 
 """An edge in a connection."""
@@ -4268,14 +4273,6 @@ input TextTemplateSubscriptionWhereInput {
   node: TextTemplateWhereInput
 }
 
-input TextTemplateUpdateDataInput {
-  name: String
-  content: String
-  customVariable: String
-  dateVariable: DateTime
-  timeVariable: DateTime
-}
-
 input TextTemplateUpdateInput {
   name: String
   content: String
@@ -4290,18 +4287,6 @@ input TextTemplateUpdateManyMutationInput {
   customVariable: String
   dateVariable: DateTime
   timeVariable: DateTime
-}
-
-input TextTemplateUpdateOneRequiredInput {
-  create: TextTemplateCreateInput
-  connect: TextTemplateWhereUniqueInput
-  update: TextTemplateUpdateDataInput
-  upsert: TextTemplateUpsertNestedInput
-}
-
-input TextTemplateUpsertNestedInput {
-  update: TextTemplateUpdateDataInput!
-  create: TextTemplateCreateInput!
 }
 
 input TextTemplateWhereInput {
@@ -4523,9 +4508,11 @@ input TextTemplateWhereUniqueInput {
   id: ID
 }
 
-type TimeRange {
+type TimeRange implements Node {
+  id: ID!
   start: Int!
-  end: Int!
+  length: Int!
+  date: DateTime!
   isInPast: Boolean!
 }
 
@@ -4540,13 +4527,16 @@ type TimeRangeConnection {
 }
 
 input TimeRangeCreateInput {
+  id: ID
   start: Int!
-  end: Int!
+  length: Int!
+  date: DateTime!
   isInPast: Boolean!
 }
 
 input TimeRangeCreateOneInput {
   create: TimeRangeCreateInput
+  connect: TimeRangeWhereUniqueInput
 }
 
 """An edge in a connection."""
@@ -4559,14 +4549,16 @@ type TimeRangeEdge {
 }
 
 enum TimeRangeOrderByInput {
-  start_ASC
-  start_DESC
-  end_ASC
-  end_DESC
-  isInPast_ASC
-  isInPast_DESC
   id_ASC
   id_DESC
+  start_ASC
+  start_DESC
+  length_ASC
+  length_DESC
+  date_ASC
+  date_DESC
+  isInPast_ASC
+  isInPast_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -4574,8 +4566,10 @@ enum TimeRangeOrderByInput {
 }
 
 type TimeRangePreviousValues {
+  id: ID!
   start: Int!
-  end: Int!
+  length: Int!
+  date: DateTime!
   isInPast: Boolean!
 }
 
@@ -4620,18 +4614,30 @@ input TimeRangeSubscriptionWhereInput {
 
 input TimeRangeUpdateDataInput {
   start: Int
-  end: Int
+  length: Int
+  date: DateTime
+  isInPast: Boolean
+}
+
+input TimeRangeUpdateInput {
+  start: Int
+  length: Int
+  date: DateTime
   isInPast: Boolean
 }
 
 input TimeRangeUpdateManyMutationInput {
   start: Int
-  end: Int
+  length: Int
+  date: DateTime
   isInPast: Boolean
 }
 
-input TimeRangeUpdateOneRequiredInput {
+input TimeRangeUpdateOneInput {
   create: TimeRangeCreateInput
+  connect: TimeRangeWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
   update: TimeRangeUpdateDataInput
   upsert: TimeRangeUpsertNestedInput
 }
@@ -4650,6 +4656,46 @@ input TimeRangeWhereInput {
 
   """Logical NOT on all given filters combined by AND."""
   NOT: [TimeRangeWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
   start: Int
 
   """All values that are not equal to given value."""
@@ -4672,32 +4718,58 @@ input TimeRangeWhereInput {
 
   """All values greater than or equal the given value."""
   start_gte: Int
-  end: Int
+  length: Int
 
   """All values that are not equal to given value."""
-  end_not: Int
+  length_not: Int
 
   """All values that are contained in given list."""
-  end_in: [Int!]
+  length_in: [Int!]
 
   """All values that are not contained in given list."""
-  end_not_in: [Int!]
+  length_not_in: [Int!]
 
   """All values less than the given value."""
-  end_lt: Int
+  length_lt: Int
 
   """All values less than or equal the given value."""
-  end_lte: Int
+  length_lte: Int
 
   """All values greater than the given value."""
-  end_gt: Int
+  length_gt: Int
 
   """All values greater than or equal the given value."""
-  end_gte: Int
+  length_gte: Int
+  date: DateTime
+
+  """All values that are not equal to given value."""
+  date_not: DateTime
+
+  """All values that are contained in given list."""
+  date_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  date_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  date_lt: DateTime
+
+  """All values less than or equal the given value."""
+  date_lte: DateTime
+
+  """All values greater than the given value."""
+  date_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  date_gte: DateTime
   isInPast: Boolean
 
   """All values that are not equal to given value."""
   isInPast_not: Boolean
+}
+
+input TimeRangeWhereUniqueInput {
+  id: ID
 }
 
 type User implements Node {
@@ -4710,7 +4782,6 @@ type User implements Node {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  clients(where: ClientWhereInput, orderBy: ClientOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Client!]
   permissions: [Permission!]!
   appointments(where: AppointmentWhereInput, orderBy: AppointmentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Appointment!]
   cart(where: CartItemWhereInput, orderBy: CartItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [CartItem!]
@@ -4728,6 +4799,7 @@ type UserConnection {
 }
 
 input UserCreateInput {
+  id: ID
   firstName: String!
   lastName: String!
   cellPhone: String!
@@ -4738,7 +4810,6 @@ input UserCreateInput {
   resetTokenExpiry: Float
   plan: String!
   permissions: UserCreatepermissionsInput
-  clients: ClientCreateManyWithoutUserInput
   appointments: AppointmentCreateManyWithoutUserInput
   cart: CartItemCreateManyWithoutUserInput
 }
@@ -4758,16 +4829,12 @@ input UserCreateOneWithoutCartInput {
   connect: UserWhereUniqueInput
 }
 
-input UserCreateOneWithoutClientsInput {
-  create: UserCreateWithoutClientsInput
-  connect: UserWhereUniqueInput
-}
-
 input UserCreatepermissionsInput {
   set: [Permission!]
 }
 
 input UserCreateWithoutAppointmentsInput {
+  id: ID
   firstName: String!
   lastName: String!
   cellPhone: String!
@@ -4778,26 +4845,11 @@ input UserCreateWithoutAppointmentsInput {
   resetTokenExpiry: Float
   plan: String!
   permissions: UserCreatepermissionsInput
-  clients: ClientCreateManyWithoutUserInput
   cart: CartItemCreateManyWithoutUserInput
 }
 
 input UserCreateWithoutCartInput {
-  firstName: String!
-  lastName: String!
-  cellPhone: String!
-  email: String!
-  businessName: String!
-  password: String!
-  resetToken: String
-  resetTokenExpiry: Float
-  plan: String!
-  permissions: UserCreatepermissionsInput
-  clients: ClientCreateManyWithoutUserInput
-  appointments: AppointmentCreateManyWithoutUserInput
-}
-
-input UserCreateWithoutClientsInput {
+  id: ID
   firstName: String!
   lastName: String!
   cellPhone: String!
@@ -4809,7 +4861,6 @@ input UserCreateWithoutClientsInput {
   plan: String!
   permissions: UserCreatepermissionsInput
   appointments: AppointmentCreateManyWithoutUserInput
-  cart: CartItemCreateManyWithoutUserInput
 }
 
 """An edge in a connection."""
@@ -4912,7 +4963,6 @@ input UserUpdateDataInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
-  clients: ClientUpdateManyWithoutUserInput
   appointments: AppointmentUpdateManyWithoutUserInput
   cart: CartItemUpdateManyWithoutUserInput
 }
@@ -4928,7 +4978,6 @@ input UserUpdateInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
-  clients: ClientUpdateManyWithoutUserInput
   appointments: AppointmentUpdateManyWithoutUserInput
   cart: CartItemUpdateManyWithoutUserInput
 }
@@ -4976,13 +5025,6 @@ input UserUpdateOneRequiredWithoutCartInput {
   upsert: UserUpsertWithoutCartInput
 }
 
-input UserUpdateOneRequiredWithoutClientsInput {
-  create: UserCreateWithoutClientsInput
-  connect: UserWhereUniqueInput
-  update: UserUpdateWithoutClientsDataInput
-  upsert: UserUpsertWithoutClientsInput
-}
-
 input UserUpdatepermissionsInput {
   set: [Permission!]
 }
@@ -4998,7 +5040,6 @@ input UserUpdateWithoutAppointmentsDataInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
-  clients: ClientUpdateManyWithoutUserInput
   cart: CartItemUpdateManyWithoutUserInput
 }
 
@@ -5013,23 +5054,7 @@ input UserUpdateWithoutCartDataInput {
   resetTokenExpiry: Float
   plan: String
   permissions: UserUpdatepermissionsInput
-  clients: ClientUpdateManyWithoutUserInput
   appointments: AppointmentUpdateManyWithoutUserInput
-}
-
-input UserUpdateWithoutClientsDataInput {
-  firstName: String
-  lastName: String
-  cellPhone: String
-  email: String
-  businessName: String
-  password: String
-  resetToken: String
-  resetTokenExpiry: Float
-  plan: String
-  permissions: UserUpdatepermissionsInput
-  appointments: AppointmentUpdateManyWithoutUserInput
-  cart: CartItemUpdateManyWithoutUserInput
 }
 
 input UserUpsertNestedInput {
@@ -5045,11 +5070,6 @@ input UserUpsertWithoutAppointmentsInput {
 input UserUpsertWithoutCartInput {
   update: UserUpdateWithoutCartDataInput!
   create: UserCreateWithoutCartInput!
-}
-
-input UserUpsertWithoutClientsInput {
-  update: UserUpdateWithoutClientsDataInput!
-  create: UserCreateWithoutClientsInput!
 }
 
 input UserWhereInput {
@@ -5443,9 +5463,6 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   plan_not_ends_with: String
-  clients_every: ClientWhereInput
-  clients_some: ClientWhereInput
-  clients_none: ClientWhereInput
   appointments_every: AppointmentWhereInput
   appointments_some: AppointmentWhereInput
   appointments_none: AppointmentWhereInput
@@ -5477,6 +5494,7 @@ type WaitListConnection {
 }
 
 input WaitListCreateInput {
+  id: ID
   user: UserCreateOneInput!
   client: ClientCreateManyInput
 }
