@@ -140,7 +140,9 @@ const Mutations = {
       html: makeANiceEmail(
         `Welcome to Perfect Day Reminders ${
           user.firstName
-        }! Enjoy your Free Trial for the next two weeks—we are confident you will love our service, finding it easy to use and enjoyable! At the end of your trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you!`,
+        }! Enjoy your Free Trial for the next two weeks—we are confident you will love our service.
+<br/><br/>
+        At the end of your trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you!`,
       ),
     })
     return user
@@ -378,7 +380,7 @@ const Mutations = {
           client: {
             connect: { id: args.client },
           },
-          confirmationStatus: { set: args.confirmationStatus },
+          confirmationStatus: args.confirmationStatus,
         },
       },
       info,
