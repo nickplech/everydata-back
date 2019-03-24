@@ -20,7 +20,6 @@ type User {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-
   permissions: [Permission]
   appointments: [Appointment!]!
   cart: [CartItem!]!

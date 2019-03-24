@@ -2,6 +2,7 @@ const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
 const Query = {
   clientsConnection: forwardTo('db'),
+
   textTemplates: forwardTo('db'),
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {

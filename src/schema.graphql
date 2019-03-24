@@ -55,6 +55,7 @@ type Mutation {
     provider: String
     color: String!
   ): Reason!
+  deleteReason(id: ID!): Reason
   createAppointment(
     reason: String!
     provider: String

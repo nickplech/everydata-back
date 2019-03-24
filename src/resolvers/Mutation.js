@@ -299,6 +299,25 @@ const Mutations = {
     )
     return reason
   },
+  async deleteReason(parent, args, ctx, info) {
+    const where = { id: args.id }
+    const reason = await ctx.db.query.reason({ where }, `{ id, user { id }}`)
+    if (!reason) throw new Error('No Type Found!')
+    const ownsReason = reason.user.id === ctx.request.userId
+    const hasPermission = ctx.request.user.permissions.some(permission =>
+      ['ADMIN'].includes(permission),
+    )
+    if (!ownsReason && !hasPermission) {
+      throw new Error('Cheater!')
+    }
+
+    return ctx.db.mutation.deleteReason(
+      {
+        where: { id: args.id },
+      },
+      info,
+    )
+  },
   async createAppointment(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) throw new Error('Please Sign In')
@@ -362,6 +381,7 @@ const Mutations = {
     return order
   },
   async createTextReminder(parent, args, ctx, info) {
+    const { userId } = ctx.request
     const from = '19252646214'
     let str = args.to
     let to = str.replace(/[\D]/g, '')
