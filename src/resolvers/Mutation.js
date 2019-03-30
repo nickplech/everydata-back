@@ -16,13 +16,16 @@ const Mutations = {
     let surName = args.lastName
     name = name.charAt(0).toUpperCase() + name.slice(1).trim()
     surName = surName.charAt(0).toUpperCase() + surName.slice(1).trim()
-    // let birthDay = args.birthDay
-    // birthDay = sanitizeDate(birthDay)
 
     const dateParts = args.birthDay.split('/')
     const ISODate = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1]
     const birthDate = new Date(ISODate).toISOString()
     args.birthDay = birthDate
+
+    let cellPhone = args.cellPhone
+    if (cellPhone.includes('_')) {
+      throw new Error('Phone number must be a complete US phone number')
+    }
     const client = await ctx.db.mutation.createClient(
       {
         data: {
@@ -36,7 +39,6 @@ const Mutations = {
       },
       info,
     )
-
     return client
   },
   updateClient(parent, args, ctx, info) {
@@ -111,6 +113,7 @@ const Mutations = {
     if (args.password !== args.confirmPassword) {
       throw new Error("Your Passwords don't match!")
     }
+
     const password = await bcrypt.hash(args.password, 10)
     const user = await ctx.db.mutation.createUser(
       {
@@ -159,10 +162,14 @@ const Mutations = {
       },
       info,
     )
+    let cellPhone = args.cellPhone
+    if (cellPhone.includes('_')) {
+      throw new Error('Your phone number must be a complete US phone number')
+    }
     const updatedUser = await ctx.db.mutation.updateUser({
       where: { id: currentUser.id },
       data: {
-        cellPhone: args.cellPhone,
+        cellPhone: cellPhone,
         businessName: args.businessName,
         email: args.email,
       },
@@ -382,25 +389,63 @@ const Mutations = {
   },
   async createTextReminder(parent, args, ctx, info) {
     const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('You must be signed in soooon')
+    }
     const from = '19252646214'
     let str = args.to
     let to = str.replace(/[\D]/g, '')
     to = '1' + to
     console.log(to)
     let text = args.text
+    if (args.text.length > 160) {
+      throw new Error('Reminders cannot be larger than 160 characters!')
+    }
     const textReminder = await ctx.db.mutation.createTextReminder(
       {
         data: {
           to,
           from,
           text,
+          forDate: args.forDate,
           user: {
-            connect: { id: args.user },
+            connect: { id: userId },
           },
           client: {
             connect: { id: args.client },
           },
           confirmationStatus: args.confirmationStatus,
+        },
+      },
+      info,
+    )
+
+    const [existingCartItem] = await ctx.db.query.cartItems({
+      where: {
+        user: { id: userId },
+        client: { id: textReminder.client.id },
+        date: textReminder.forDate,
+      },
+    })
+
+    if (existingCartItem) {
+      console.log('This Confirmation Has Already Been Logged')
+      return ctx.db.mutation.updateCartItem(
+        {
+          where: { id: existingCartItem.id },
+          data: { confirmationStatus: args.confirmationStatus },
+        },
+        info,
+      )
+    }
+    const cartItem = await ctx.db.mutation.createCartItem(
+      {
+        data: {
+          date: textReminder.forDate,
+          user: { connect: { id: userId } },
+          client: { connect: { id: args.client } },
+          textReminder: { connect: { id: textReminder.id } },
+          confirmationStatus: textReminder.confirmationStatus,
         },
       },
       info,
@@ -414,11 +459,19 @@ const Mutations = {
         if (err) {
           console.log(err)
         } else {
-          console.log(responseData)
+          if (responseData.messages[0]['status'] === '0') {
+            console.log('Message sent successfully.')
+            console.log(responseData)
+          } else {
+            console.log(
+              `Message failed with error: ${
+                responseData.messages[0]['error-text']
+              }`,
+            )
+          }
         }
       },
     )
-
     return textReminder
   },
   async deleteTextReminder(parent, args, ctx, info) {
@@ -434,42 +487,7 @@ const Mutations = {
 
     return ctx.db.mutation.deleteTextReminder({ where }, info)
   },
-  async addToCart(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!userId) {
-      throw new Error('You must be signed in')
-    }
-    const [existingCartItem] = await ctx.db.query.cartItems({
-      where: {
-        user: { id: userId },
-        client: { id: args.id },
-      },
-    })
-    if (existingCartItem) {
-      console.log('This Confirmation Has Already Been Logged')
-      return ctx.db.mutation.updateCartItem(
-        {
-          where: { id: existingCartItem.id },
-          data: { confirmationStatus: args.confirmationStatus },
-        },
-        info,
-      )
-    }
-    return ctx.db.mutation.createCartItem(
-      {
-        data: {
-          user: {
-            connect: { id: userId },
-          },
-          client: {
-            connect: { id: args.id },
-          },
-          confirmationStatus: args.confirmationStatus,
-        },
-      },
-      info,
-    )
-  },
+
   async removeFromCart(parent, args, ctx, info) {
     const cartItem = await ctx.db.query.cartItem(
       {

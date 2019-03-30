@@ -10,6 +10,12 @@ enum Permission {
   PERMISSIONUPDATE
 }
 
+enum ConfirmationStatus {
+  UNCONFIRMED
+  CONFIRMED
+  CANCELED
+}
+
 type User {
   id: ID! @unique
   firstName: String!
@@ -21,9 +27,9 @@ type User {
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission]
-  appointments: [Appointment!]!
-  cart: [CartItem!]!
+
   plan: String!
+  smsNumber: String
 }
 
 type Client {
@@ -36,6 +42,7 @@ type Client {
   birthDay: DateTime
   image: String
   user: User!
+  appointments: [Appointment]
 }
 
 type CartItem {
@@ -43,8 +50,10 @@ type CartItem {
   quantity: Int! @default(value: 1)
   client: Client
   user: User!
-  date: DateTime
-  confirmationStatus: String!
+  textReminder: TextReminder
+  appointment: Appointment
+  date: String!
+  confirmationStatus: String
 }
 
 type Appointment {
@@ -57,6 +66,7 @@ type Appointment {
   note: String
   client: [Client!]!
   user: User!
+  textReminder: [TextReminder]
 }
 
 type WaitList {
@@ -93,6 +103,9 @@ type TextReminder {
   updatedAt: DateTime!
   user: User!
   client: Client!
+  forDate: String!
+  forTime: String
+  appointment: Appointment
 }
 
 type TextTemplate {
@@ -122,7 +135,6 @@ type OrderPackage {
   id: ID! @unique
   title: String!
   description: String!
-  image: String!
   price: Int!
   plan: String!
   quantity: Int! @default(value: 1)

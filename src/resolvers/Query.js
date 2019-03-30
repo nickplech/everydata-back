@@ -2,8 +2,8 @@ const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
 const Query = {
   clientsConnection: forwardTo('db'),
-
   textTemplates: forwardTo('db'),
+  cartItem: forwardTo('db'),
   me(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       return null
@@ -15,6 +15,15 @@ const Query = {
       info,
     )
   },
+  async users(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do this!')
+    }
+    console.log(ctx.request.userId)
+    hasPermission(ctx.request.user, ['ADMIN', 'PERMISSIONUPDATE'])
+    return ctx.db.query.users({}, info)
+  },
+
   async client(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
@@ -41,18 +50,11 @@ const Query = {
     if (!userId) {
       throw new Error('you must be signed in!')
     }
-    return ctx.db.query.clients(
-      { where: { user: { id_contains: userId } } },
+    const clients = await ctx.db.query.clients(
+      { where: { user: { id: userId } } },
       info,
     )
-  },
-  async users(parent, args, ctx, info) {
-    if (!ctx.request.userId) {
-      throw new Error('You must be logged in to do this!')
-    }
-    console.log(ctx.request.userId)
-    hasPermission(ctx.request.user, ['ADMIN', 'PERMISSIONUPDATE'])
-    return ctx.db.query.users({}, info)
+    return clients
   },
 
   async order(parent, args, ctx, info) {
@@ -136,6 +138,22 @@ const Query = {
       info,
     )
     return textReminders
+  },
+  async cartItems(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    if (!userId) {
+      throw new Error('Please Login')
+    }
+    const cartItems = await ctx.db.query.cartItems(
+      {
+        where: {
+          user: { id: userId },
+          client: { id: args.client },
+        },
+      },
+      info,
+    )
+    return cartItems
   },
 }
 

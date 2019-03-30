@@ -46,7 +46,6 @@ type Mutation {
     confirmPassword: String!
   ): User!
   updatePermissions(permissions: [Permission], userId: ID!): User
-  addToCart(id: ID!, confirmationStatus: String!): CartItem
   removeFromCart(id: ID!): CartItem
   createOrder(token: String!, plan: String!, price: Int!): Order!
   createReason(
@@ -68,8 +67,8 @@ type Mutation {
     to: String!
     text: String!
     client: ID!
-    user: ID!
-    confirmationStatus: String!
+    confirmationStatus: String
+    forDate: String!
   ): TextReminder!
   deleteTextReminder(id: ID!): TextReminder
 }
@@ -82,6 +81,8 @@ type Query {
     skip: Int
     first: Int
   ): [Client]!
+  cartItem(id: ID!): CartItem
+  cartItems(orderBy: CartItemOrderByInput): [CartItem]
   textTemplates: [TextTemplate]!
   reason(id: ID!): Reason
   reasons(orderBy: ReasonOrderByInput): [Reason]
@@ -93,6 +94,19 @@ type Query {
   textReminders(client: ID!, orderBy: TextReminderOrderByInput): [TextReminder]!
 }
 
+# type Client {
+#   id: ID!
+#   firstName: String!
+#   lastName: String!
+#   dependantFirstName: String
+#   dependantLastName: String
+#   cellPhone: String!
+#   birthDay: DateTime
+#   image: String
+#   user: User!
+#   appointments: [Appointment]
+# }
+
 type User {
   id: ID!
   firstName: String!
@@ -102,8 +116,6 @@ type User {
   businessName: String!
   clients: [Client!]!
   permissions: [Permission!]!
-  cart: [CartItem!]!
   plan: String!
   orders: [Order]
-  appointments: [Appointment!]!
 }
