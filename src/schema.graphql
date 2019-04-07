@@ -69,6 +69,7 @@ type Mutation {
     client: ID!
     confirmationStatus: String
     forDate: String!
+    forTime: String!
   ): TextReminder!
   deleteTextReminder(id: ID!): TextReminder
 }
@@ -94,18 +95,9 @@ type Query {
   textReminders(client: ID!, orderBy: TextReminderOrderByInput): [TextReminder]!
 }
 
-# type Client {
-#   id: ID!
-#   firstName: String!
-#   lastName: String!
-#   dependantFirstName: String
-#   dependantLastName: String
-#   cellPhone: String!
-#   birthDay: DateTime
-#   image: String
-#   user: User!
-#   appointments: [Appointment]
-# }
+type Subscription {
+  textReminder: TextReminder
+}
 
 type User {
   id: ID!
@@ -114,7 +106,6 @@ type User {
   cellPhone: String!
   email: String!
   businessName: String!
-  clients: [Client!]!
   permissions: [Permission!]!
   plan: String!
   orders: [Order]

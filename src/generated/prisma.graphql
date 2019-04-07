@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Sat Mar 30 2019 00:07:38 GMT-0700 (PDT)
+# timestamp: Sat Apr 06 2019 17:56:01 GMT-0700 (PDT)
 
 type AggregateAppointment {
   count: Int!
@@ -653,6 +653,7 @@ type CartItem implements Node {
   textReminder: TextReminder
   appointment: Appointment
   date: String!
+  time: String!
   confirmationStatus: String
 }
 
@@ -670,6 +671,7 @@ input CartItemCreateInput {
   id: ID
   quantity: Int
   date: String!
+  time: String!
   confirmationStatus: String
   client: ClientCreateOneInput
   user: UserCreateOneInput!
@@ -693,6 +695,8 @@ enum CartItemOrderByInput {
   quantity_DESC
   date_ASC
   date_DESC
+  time_ASC
+  time_DESC
   confirmationStatus_ASC
   confirmationStatus_DESC
   updatedAt_ASC
@@ -705,6 +709,7 @@ type CartItemPreviousValues {
   id: ID!
   quantity: Int!
   date: String!
+  time: String!
   confirmationStatus: String
 }
 
@@ -750,6 +755,7 @@ input CartItemSubscriptionWhereInput {
 input CartItemUpdateInput {
   quantity: Int
   date: String
+  time: String
   confirmationStatus: String
   client: ClientUpdateOneInput
   user: UserUpdateOneRequiredInput
@@ -760,6 +766,7 @@ input CartItemUpdateInput {
 input CartItemUpdateManyMutationInput {
   quantity: Int
   date: String
+  time: String
   confirmationStatus: String
 }
 
@@ -874,6 +881,46 @@ input CartItemWhereInput {
 
   """All values not ending with the given string."""
   date_not_ends_with: String
+  time: String
+
+  """All values that are not equal to given value."""
+  time_not: String
+
+  """All values that are contained in given list."""
+  time_in: [String!]
+
+  """All values that are not contained in given list."""
+  time_not_in: [String!]
+
+  """All values less than the given value."""
+  time_lt: String
+
+  """All values less than or equal the given value."""
+  time_lte: String
+
+  """All values greater than the given value."""
+  time_gt: String
+
+  """All values greater than or equal the given value."""
+  time_gte: String
+
+  """All values containing the given string."""
+  time_contains: String
+
+  """All values not containing the given string."""
+  time_not_contains: String
+
+  """All values starting with the given string."""
+  time_starts_with: String
+
+  """All values not starting with the given string."""
+  time_not_starts_with: String
+
+  """All values ending with the given string."""
+  time_ends_with: String
+
+  """All values not ending with the given string."""
+  time_not_ends_with: String
   confirmationStatus: String
 
   """All values that are not equal to given value."""
@@ -3707,14 +3754,14 @@ type TextReminder implements Node {
   id: ID!
   from: String!
   to: String!
-  text: String!
+  text: String
   statusReportReq: Boolean
   confirmationStatus: String
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
   client: Client!
-  forDate: String!
+  forDate: String
   forTime: String
   appointment: Appointment
 }
@@ -3733,10 +3780,10 @@ input TextReminderCreateInput {
   id: ID
   from: String!
   to: String!
-  text: String!
+  text: String
   statusReportReq: Boolean
   confirmationStatus: String
-  forDate: String!
+  forDate: String
   forTime: String
   user: UserCreateOneInput!
   client: ClientCreateOneInput!
@@ -3757,10 +3804,10 @@ input TextReminderCreateWithoutAppointmentInput {
   id: ID
   from: String!
   to: String!
-  text: String!
+  text: String
   statusReportReq: Boolean
   confirmationStatus: String
-  forDate: String!
+  forDate: String
   forTime: String
   user: UserCreateOneInput!
   client: ClientCreateOneInput!
@@ -3802,12 +3849,12 @@ type TextReminderPreviousValues {
   id: ID!
   from: String!
   to: String!
-  text: String!
+  text: String
   statusReportReq: Boolean
   confirmationStatus: String
   createdAt: DateTime!
   updatedAt: DateTime!
-  forDate: String!
+  forDate: String
   forTime: String
 }
 

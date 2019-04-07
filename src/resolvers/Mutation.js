@@ -288,7 +288,9 @@ const Mutations = {
     if (!userId) {
       throw new Error('You must be signed in')
     }
-
+    if (args.name.length < 1) {
+      throw new Error('A name/appointment type identifier is required')
+    }
     args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1)
 
     const reason = await ctx.db.mutation.createReason(
@@ -390,7 +392,7 @@ const Mutations = {
   async createTextReminder(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
-      throw new Error('You must be signed in soooon')
+      throw new Error('You must be signed in to Send SMS Reminder manually')
     }
     const from = '19252646214'
     let str = args.to
@@ -408,6 +410,7 @@ const Mutations = {
           from,
           text,
           forDate: args.forDate,
+          forTime: args.forTime,
           user: {
             connect: { id: userId },
           },
@@ -415,37 +418,6 @@ const Mutations = {
             connect: { id: args.client },
           },
           confirmationStatus: args.confirmationStatus,
-        },
-      },
-      info,
-    )
-
-    const [existingCartItem] = await ctx.db.query.cartItems({
-      where: {
-        user: { id: userId },
-        client: { id: textReminder.client.id },
-        date: textReminder.forDate,
-      },
-    })
-
-    if (existingCartItem) {
-      console.log('This Confirmation Has Already Been Logged')
-      return ctx.db.mutation.updateCartItem(
-        {
-          where: { id: existingCartItem.id },
-          data: { confirmationStatus: args.confirmationStatus },
-        },
-        info,
-      )
-    }
-    const cartItem = await ctx.db.mutation.createCartItem(
-      {
-        data: {
-          date: textReminder.forDate,
-          user: { connect: { id: userId } },
-          client: { connect: { id: args.client } },
-          textReminder: { connect: { id: textReminder.id } },
-          confirmationStatus: textReminder.confirmationStatus,
         },
       },
       info,
@@ -472,7 +444,39 @@ const Mutations = {
         }
       },
     )
-    return textReminder
+
+    const [existingCartItem] = await ctx.db.query.cartItems({
+      where: {
+        user: { id: userId },
+        client: { id: textReminder.client.id },
+        date: textReminder.forDate,
+        time: textReminder.forTime,
+      },
+    })
+
+    if (existingCartItem) {
+      console.log('This Confirmation Has Already Been Logged')
+      return ctx.db.mutation.updateCartItem(
+        {
+          where: { id: existingCartItem.id },
+          data: { confirmationStatus: args.confirmationStatus },
+        },
+        info,
+      )
+    }
+    return ctx.db.mutation.createCartItem(
+      {
+        data: {
+          date: textReminder.forDate,
+          time: textReminder.forTime,
+          user: { connect: { id: userId } },
+          client: { connect: { id: args.client } },
+          textReminder: { connect: { id: textReminder.id } },
+          confirmationStatus: textReminder.confirmationStatus,
+        },
+      },
+      info,
+    )
   },
   async deleteTextReminder(parent, args, ctx, info) {
     const where = { id: args.id }

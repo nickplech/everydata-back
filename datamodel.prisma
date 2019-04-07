@@ -27,7 +27,6 @@ type User {
   resetToken: String
   resetTokenExpiry: Float
   permissions: [Permission]
-
   plan: String!
   smsNumber: String
 }
@@ -53,6 +52,7 @@ type CartItem {
   textReminder: TextReminder
   appointment: Appointment
   date: String!
+  time: String!
   confirmationStatus: String
 }
 
@@ -96,14 +96,14 @@ type TextReminder {
   id: ID! @unique
   from: String!
   to: String!
-  text: String!
+  text: String
   statusReportReq: Boolean
   confirmationStatus: String
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
   client: Client!
-  forDate: String!
+  forDate: String
   forTime: String
   appointment: Appointment
 }
