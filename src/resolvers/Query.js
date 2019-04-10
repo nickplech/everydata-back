@@ -1,7 +1,10 @@
 const { forwardTo } = require('prisma-binding')
 const { hasPermission } = require('../utils')
+const { addFragmentToInfo } = require('graphql-binding')
+
 const Query = {
   clientsConnection: forwardTo('db'),
+  textTemplate: forwardTo('db'),
   textTemplates: forwardTo('db'),
   cartItem: forwardTo('db'),
   me(parent, args, ctx, info) {
@@ -45,16 +48,13 @@ const Query = {
     }
     return client
   },
+
   async clients(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
       throw new Error('you must be signed in!')
     }
-    const clients = await ctx.db.query.clients(
-      { where: { user: { id: userId } } },
-      info,
-    )
-    return clients
+    return ctx.db.query.clients({ user: { id: userId } }, info)
   },
 
   async order(parent, args, ctx, info) {

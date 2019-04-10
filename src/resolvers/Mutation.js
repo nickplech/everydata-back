@@ -88,7 +88,6 @@ const Mutations = {
     let surName = args.lastName
     name = name.charAt(0).toUpperCase() + name.slice(1).trim()
     surName = surName.charAt(0).toUpperCase() + surName.slice(1).trim()
-
     if (!args.email.includes('@')) {
       throw new Error('Please enter a valid email address')
     }
@@ -113,7 +112,6 @@ const Mutations = {
     if (args.password !== args.confirmPassword) {
       throw new Error("Your Passwords don't match!")
     }
-
     const password = await bcrypt.hash(args.password, 10)
     const user = await ctx.db.mutation.createUser(
       {
@@ -143,9 +141,9 @@ const Mutations = {
       html: makeANiceEmail(
         `Welcome to Perfect Day Reminders ${
           user.firstName
-        }! Enjoy your Free Trial for the next two weeks—we are confident you will love our service.
+        }! Enjoy your Free Trial for the next two weeks!
 <br/><br/>
-        At the end of your trial, if you still wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you!`,
+        At the end of your trial, if you  wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you!`,
       ),
     })
     return user
@@ -474,6 +472,23 @@ const Mutations = {
           textReminder: { connect: { id: textReminder.id } },
           confirmationStatus: textReminder.confirmationStatus,
         },
+      },
+      info,
+    )
+  },
+  async updateTextReminder(parent, args, ctx, info) {
+    const { userId } = ctx.request
+    const confirm = { confirmationStatus: 'CONFIRMED' }
+    const cancel = { confirmationStatus: 'CANCELED' }
+    const textReminder = await ctx.db.query.textReminder(
+      {
+        where: {
+          user: { id: userId },
+          client: { id: textReminder.client.id },
+          forDate: textReminder.forDate,
+          forTime: textReminder.forTime,
+        },
+        data: {},
       },
       info,
     )

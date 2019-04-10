@@ -71,6 +71,7 @@ type Mutation {
     forDate: String!
     forTime: String!
   ): TextReminder!
+  updateTextReminder(id: ID!): TextReminder!
   deleteTextReminder(id: ID!): TextReminder
 }
 
@@ -84,6 +85,7 @@ type Query {
   ): [Client]!
   cartItem(id: ID!): CartItem
   cartItems(orderBy: CartItemOrderByInput): [CartItem]
+  textTemplate(id: ID!): TextTemplate!
   textTemplates: [TextTemplate]!
   reason(id: ID!): Reason
   reasons(orderBy: ReasonOrderByInput): [Reason]
@@ -109,4 +111,18 @@ type User {
   permissions: [Permission!]!
   plan: String!
   orders: [Order]
+}
+
+type Client {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  fullName: String!
+  dependantFirstName: String
+  dependantLastName: String
+  cellPhone: String!
+  birthDay: DateTime
+  image: String
+  user: User!
+  appointments: [Appointment]
 }
