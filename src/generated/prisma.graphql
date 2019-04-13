@@ -1,5 +1,5 @@
 # source: https://us1.prisma.sh/nick-plechas/perfectdayreminders/dev
-# timestamp: Sat Apr 06 2019 17:56:01 GMT-0700 (PDT)
+# timestamp: Sat Apr 13 2019 12:47:26 GMT-0700 (PDT)
 
 type AggregateAppointment {
   count: Int!
@@ -654,7 +654,6 @@ type CartItem implements Node {
   appointment: Appointment
   date: String!
   time: String!
-  confirmationStatus: String
 }
 
 """A connection to a list of items."""
@@ -672,7 +671,6 @@ input CartItemCreateInput {
   quantity: Int
   date: String!
   time: String!
-  confirmationStatus: String
   client: ClientCreateOneInput
   user: UserCreateOneInput!
   textReminder: TextReminderCreateOneInput
@@ -697,8 +695,6 @@ enum CartItemOrderByInput {
   date_DESC
   time_ASC
   time_DESC
-  confirmationStatus_ASC
-  confirmationStatus_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -710,7 +706,6 @@ type CartItemPreviousValues {
   quantity: Int!
   date: String!
   time: String!
-  confirmationStatus: String
 }
 
 type CartItemSubscriptionPayload {
@@ -756,7 +751,6 @@ input CartItemUpdateInput {
   quantity: Int
   date: String
   time: String
-  confirmationStatus: String
   client: ClientUpdateOneInput
   user: UserUpdateOneRequiredInput
   textReminder: TextReminderUpdateOneInput
@@ -767,7 +761,6 @@ input CartItemUpdateManyMutationInput {
   quantity: Int
   date: String
   time: String
-  confirmationStatus: String
 }
 
 input CartItemWhereInput {
@@ -921,46 +914,6 @@ input CartItemWhereInput {
 
   """All values not ending with the given string."""
   time_not_ends_with: String
-  confirmationStatus: String
-
-  """All values that are not equal to given value."""
-  confirmationStatus_not: String
-
-  """All values that are contained in given list."""
-  confirmationStatus_in: [String!]
-
-  """All values that are not contained in given list."""
-  confirmationStatus_not_in: [String!]
-
-  """All values less than the given value."""
-  confirmationStatus_lt: String
-
-  """All values less than or equal the given value."""
-  confirmationStatus_lte: String
-
-  """All values greater than the given value."""
-  confirmationStatus_gt: String
-
-  """All values greater than or equal the given value."""
-  confirmationStatus_gte: String
-
-  """All values containing the given string."""
-  confirmationStatus_contains: String
-
-  """All values not containing the given string."""
-  confirmationStatus_not_contains: String
-
-  """All values starting with the given string."""
-  confirmationStatus_starts_with: String
-
-  """All values not starting with the given string."""
-  confirmationStatus_not_starts_with: String
-
-  """All values ending with the given string."""
-  confirmationStatus_ends_with: String
-
-  """All values not ending with the given string."""
-  confirmationStatus_not_ends_with: String
   client: ClientWhereInput
   user: UserWhereInput
   textReminder: TextReminderWhereInput
@@ -975,6 +928,7 @@ type Client implements Node {
   id: ID!
   firstName: String!
   lastName: String!
+  fullName: String!
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String!
@@ -998,6 +952,7 @@ input ClientCreateInput {
   id: ID
   firstName: String!
   lastName: String!
+  fullName: String!
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String!
@@ -1026,6 +981,7 @@ input ClientCreateWithoutAppointmentsInput {
   id: ID
   firstName: String!
   lastName: String!
+  fullName: String!
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String!
@@ -1050,6 +1006,8 @@ enum ClientOrderByInput {
   firstName_DESC
   lastName_ASC
   lastName_DESC
+  fullName_ASC
+  fullName_DESC
   dependantFirstName_ASC
   dependantFirstName_DESC
   dependantLastName_ASC
@@ -1070,6 +1028,7 @@ type ClientPreviousValues {
   id: ID!
   firstName: String!
   lastName: String!
+  fullName: String!
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String!
@@ -1206,6 +1165,46 @@ input ClientScalarWhereInput {
 
   """All values not ending with the given string."""
   lastName_not_ends_with: String
+  fullName: String
+
+  """All values that are not equal to given value."""
+  fullName_not: String
+
+  """All values that are contained in given list."""
+  fullName_in: [String!]
+
+  """All values that are not contained in given list."""
+  fullName_not_in: [String!]
+
+  """All values less than the given value."""
+  fullName_lt: String
+
+  """All values less than or equal the given value."""
+  fullName_lte: String
+
+  """All values greater than the given value."""
+  fullName_gt: String
+
+  """All values greater than or equal the given value."""
+  fullName_gte: String
+
+  """All values containing the given string."""
+  fullName_contains: String
+
+  """All values not containing the given string."""
+  fullName_not_contains: String
+
+  """All values starting with the given string."""
+  fullName_starts_with: String
+
+  """All values not starting with the given string."""
+  fullName_not_starts_with: String
+
+  """All values ending with the given string."""
+  fullName_ends_with: String
+
+  """All values not ending with the given string."""
+  fullName_not_ends_with: String
   dependantFirstName: String
 
   """All values that are not equal to given value."""
@@ -1432,6 +1431,7 @@ input ClientSubscriptionWhereInput {
 input ClientUpdateDataInput {
   firstName: String
   lastName: String
+  fullName: String
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String
@@ -1444,6 +1444,7 @@ input ClientUpdateDataInput {
 input ClientUpdateInput {
   firstName: String
   lastName: String
+  fullName: String
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String
@@ -1456,6 +1457,7 @@ input ClientUpdateInput {
 input ClientUpdateManyDataInput {
   firstName: String
   lastName: String
+  fullName: String
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String
@@ -1478,6 +1480,7 @@ input ClientUpdateManyInput {
 input ClientUpdateManyMutationInput {
   firstName: String
   lastName: String
+  fullName: String
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String
@@ -1521,6 +1524,7 @@ input ClientUpdateOneRequiredInput {
 input ClientUpdateWithoutAppointmentsDataInput {
   firstName: String
   lastName: String
+  fullName: String
   dependantFirstName: String
   dependantLastName: String
   cellPhone: String
@@ -1685,6 +1689,46 @@ input ClientWhereInput {
 
   """All values not ending with the given string."""
   lastName_not_ends_with: String
+  fullName: String
+
+  """All values that are not equal to given value."""
+  fullName_not: String
+
+  """All values that are contained in given list."""
+  fullName_in: [String!]
+
+  """All values that are not contained in given list."""
+  fullName_not_in: [String!]
+
+  """All values less than the given value."""
+  fullName_lt: String
+
+  """All values less than or equal the given value."""
+  fullName_lte: String
+
+  """All values greater than the given value."""
+  fullName_gt: String
+
+  """All values greater than or equal the given value."""
+  fullName_gte: String
+
+  """All values containing the given string."""
+  fullName_contains: String
+
+  """All values not containing the given string."""
+  fullName_not_contains: String
+
+  """All values starting with the given string."""
+  fullName_starts_with: String
+
+  """All values not starting with the given string."""
+  fullName_not_starts_with: String
+
+  """All values ending with the given string."""
+  fullName_ends_with: String
+
+  """All values not ending with the given string."""
+  fullName_not_ends_with: String
   dependantFirstName: String
 
   """All values that are not equal to given value."""
@@ -3760,7 +3804,7 @@ type TextReminder implements Node {
   createdAt: DateTime!
   updatedAt: DateTime!
   user: User!
-  client: Client!
+  client: Client
   forDate: String
   forTime: String
   appointment: Appointment
@@ -3786,7 +3830,7 @@ input TextReminderCreateInput {
   forDate: String
   forTime: String
   user: UserCreateOneInput!
-  client: ClientCreateOneInput!
+  client: ClientCreateOneInput
   appointment: AppointmentCreateOneWithoutTextReminderInput
 }
 
@@ -3810,7 +3854,7 @@ input TextReminderCreateWithoutAppointmentInput {
   forDate: String
   forTime: String
   user: UserCreateOneInput!
-  client: ClientCreateOneInput!
+  client: ClientCreateOneInput
 }
 
 """An edge in a connection."""
@@ -4245,7 +4289,7 @@ input TextReminderUpdateDataInput {
   forDate: String
   forTime: String
   user: UserUpdateOneRequiredInput
-  client: ClientUpdateOneRequiredInput
+  client: ClientUpdateOneInput
   appointment: AppointmentUpdateOneWithoutTextReminderInput
 }
 
@@ -4258,7 +4302,7 @@ input TextReminderUpdateInput {
   forDate: String
   forTime: String
   user: UserUpdateOneRequiredInput
-  client: ClientUpdateOneRequiredInput
+  client: ClientUpdateOneInput
   appointment: AppointmentUpdateOneWithoutTextReminderInput
 }
 
@@ -4317,7 +4361,7 @@ input TextReminderUpdateWithoutAppointmentDataInput {
   forDate: String
   forTime: String
   user: UserUpdateOneRequiredInput
-  client: ClientUpdateOneRequiredInput
+  client: ClientUpdateOneInput
 }
 
 input TextReminderUpdateWithWhereUniqueWithoutAppointmentInput {

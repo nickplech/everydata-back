@@ -34,6 +34,7 @@ const Mutations = {
               id: ctx.request.userId,
             },
           },
+          fullName: name + ' ' + surName,
           ...args,
         },
       },
@@ -457,7 +458,9 @@ const Mutations = {
       return ctx.db.mutation.updateCartItem(
         {
           where: { id: existingCartItem.id },
-          data: { confirmationStatus: args.confirmationStatus },
+          data: {
+            textReminder: { confirmationStatus: args.confirmationStatus },
+          },
         },
         info,
       )
@@ -470,7 +473,6 @@ const Mutations = {
           user: { connect: { id: userId } },
           client: { connect: { id: args.client } },
           textReminder: { connect: { id: textReminder.id } },
-          confirmationStatus: textReminder.confirmationStatus,
         },
       },
       info,
@@ -478,9 +480,7 @@ const Mutations = {
   },
   async updateTextReminder(parent, args, ctx, info) {
     const { userId } = ctx.request
-    const confirm = { confirmationStatus: 'CONFIRMED' }
-    const cancel = { confirmationStatus: 'CANCELED' }
-    const textReminder = await ctx.db.query.textReminder(
+    const [textReminder] = await ctx.db.query.textReminders(
       {
         where: {
           user: { id: userId },
@@ -488,7 +488,17 @@ const Mutations = {
           forDate: textReminder.forDate,
           forTime: textReminder.forTime,
         },
-        data: {},
+      },
+      info,
+    )
+
+    const response = textReminder.text.includes('confirm', '1')
+    const reminderStatus = response ? 'CONFIRMED' : 'CANCELED'
+
+    return ctx.db.mutation.updateTextReminder(
+      {
+        where: { id: textReminder.id },
+        data: { confirmationStatus: reminderStatus },
       },
       info,
     )

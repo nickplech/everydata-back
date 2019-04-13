@@ -113,16 +113,16 @@ type User {
   orders: [Order]
 }
 
-type Client {
-  id: ID!
-  firstName: String!
-  lastName: String!
-  fullName: String!
-  dependantFirstName: String
-  dependantLastName: String
-  cellPhone: String!
-  birthDay: DateTime
-  image: String
-  user: User!
-  appointments: [Appointment]
-}
+# type Client {
+#   id: ID!
+#   firstName: String!
+#   lastName: String!
+#   fullName: String!
+#   dependantFirstName: String
+#   dependantLastName: String
+#   cellPhone: String!
+#   birthDay: DateTime
+#   image: String
+#   user: User!
+#   appointments: [Appointment]
+# }

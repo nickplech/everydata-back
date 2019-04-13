@@ -54,7 +54,7 @@ const Query = {
     if (!userId) {
       throw new Error('you must be signed in!')
     }
-    return ctx.db.query.clients({ user: { id: userId } }, info)
+    return ctx.db.query.clients({}, info)
   },
 
   async order(parent, args, ctx, info) {
