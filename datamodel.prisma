@@ -4,9 +4,6 @@ enum Permission {
   CLIENTCREATE
   CLIENTUPDATE
   CLIENTDELETE
-  HIPAA
-  EXPRESS
-  STANDARD
   PERMISSIONUPDATE
 }
 
@@ -17,7 +14,7 @@ enum ConfirmationStatus {
 }
 
 type User {
-  id: ID! @unique
+  id: ID! @unique @id
   firstName: String!
   lastName: String!
   cellPhone: String! @unique
@@ -26,127 +23,32 @@ type User {
   password: String!
   resetToken: String
   resetTokenExpiry: Float
-  permissions: [Permission]
-  plan: String!
-  smsNumber: String
+  permissions: [Permission] @scalarList(strategy: RELATION)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Client {
-  id: ID! @unique
+  id: ID! @unique @id
   firstName: String!
-  lastName: String!
-  fullName: String!
-  dependantFirstName: String
-  dependantLastName: String
+  lastName: String
+  fullName: String
+  handled: Boolean! @default(value: false)
+  seen: Boolean @default(value: false)
+  businessName: String
   cellPhone: String! @unique
-  birthDay: DateTime
+  email: String!
   image: String
-  user: User!
-  appointments: [Appointment]
-}
-
-type CartItem {
-  id: ID! @unique
-  quantity: Int! @default(value: 1)
-  client: Client
-  user: User!
-  textReminder: TextReminder
-  appointment: Appointment
-  date: String!
-  time: String!
-}
-
-type Appointment {
-  id: ID! @unique
-  reason: [Reason!]!
-  provider: [String]
-  date: DateTime!
-  timeRange: TimeRange
-  bookedBy: String
-  note: String
-  client: [Client!]!
-  user: User!
-  textReminder: [TextReminder]
-}
-
-type WaitList {
-  id: ID! @unique
-  user: User!
-  client: [Client!]!
-}
-
-type Reason {
-  id: ID! @unique
-  name: String!
-  defaultLength: Int
-  provider: String
-  color: String!
-  user: User!
-}
-
-type TimeRange {
-  id: ID! @unique
-  start: Int!
-  length: Int!
-  date: DateTime!
-  isInPast: Boolean!
-}
-
-type TextReminder {
-  id: ID! @unique
-  from: String!
-  to: String!
-  text: String
-  statusReportReq: Boolean
-  confirmationStatus: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  user: User!
-  client: Client
-  forDate: String
-  forTime: String
-  appointment: Appointment
-}
-
-type TextTemplate {
-  id: ID! @unique
-  name: String!
-  content: String!
-  customVariable: String
-  dateVariable: DateTime
-  timeVariable: DateTime
-}
-
-type InboundMessage {
-  id: ID! @unique
-  msisdn: String!
-  to: String!
-  text: String!
-  type: String!
-  keyword: String!
-  messageTimeStamp: String!
-  user: User!
-  client: Client!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type OrderPackage {
-  id: ID! @unique
-  title: String!
-  description: String!
-  price: Int!
-  plan: String!
-  quantity: Int! @default(value: 1)
   user: User
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
-type Order {
-  id: ID! @unique
-  plan: String!
-  price: Int!
-  user: User!
-  charge: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+type Post {
+  id: ID! @unique @id
+  message: String
+  file: String
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  user: User
 }

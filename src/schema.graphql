@@ -6,10 +6,11 @@ type SuccessMessage {
 
 type Mutation {
   createClient(
-    firstName: String
+    firstName: String!
     lastName: String
-    cellPhone: String
-    birthDay: DateTime
+    cellPhone: String!
+    businessName: String
+    email: String!
     image: String
   ): Client!
   updateClient(
@@ -17,8 +18,10 @@ type Mutation {
     firstName: String
     lastName: String
     cellPhone: String
-    birthDay: DateTime
+    email: String
+    handled: Boolean
     image: String
+    seen: Boolean
   ): Client!
   deleteClient(id: ID!): Client
   signup(
@@ -29,7 +32,6 @@ type Mutation {
     email: String!
     password: String!
     confirmPassword: String!
-    plan: String!
   ): User!
   updateUser(
     cellPhone: String
@@ -46,33 +48,8 @@ type Mutation {
     confirmPassword: String!
   ): User!
   updatePermissions(permissions: [Permission], userId: ID!): User
-  removeFromCart(id: ID!): CartItem
-  createOrder(token: String!, plan: String!, price: Int!): Order!
-  createReason(
-    name: String!
-    defaultLength: Int
-    provider: String
-    color: String!
-  ): Reason!
-  deleteReason(id: ID!): Reason
-  createAppointment(
-    reason: String!
-    provider: String
-    date: DateTime!
-    bookedBy: String
-    note: String
-    client: String!
-  ): Appointment!
-  createTextReminder(
-    to: String!
-    text: String!
-    client: ID!
-    confirmationStatus: String
-    forDate: String!
-    forTime: String!
-  ): TextReminder!
-  updateTextReminder(id: ID!): TextReminder!
-  deleteTextReminder(id: ID!): TextReminder
+  createPost(message: String, file: String): Post!
+  deletePost(id: ID!): Post
 }
 
 type Query {
@@ -83,22 +60,16 @@ type Query {
     skip: Int
     first: Int
   ): [Client]!
-  cartItem(id: ID!): CartItem
-  cartItems(orderBy: CartItemOrderByInput): [CartItem]
-  textTemplate(id: ID!): TextTemplate!
-  textTemplates: [TextTemplate]!
-  reason(id: ID!): Reason
-  reasons(orderBy: ReasonOrderByInput): [Reason]
   clientsConnection(where: ClientWhereInput): ClientConnection!
   me: User
   users: [User]!
-  order(id: ID!): Order
-  orders(orderBy: OrderOrderByInput): [Order]!
-  textReminders(client: ID!, orderBy: TextReminderOrderByInput): [TextReminder]!
-}
-
-type Subscription {
-  textReminder: TextReminder
+  postsConnection(where: PostWhereInput): PostConnection!
+  posts(
+    where: PostWhereInput
+    orderBy: PostOrderByInput
+    skip: Int
+    first: Int
+  ): [Post]
 }
 
 type User {
@@ -109,20 +80,4 @@ type User {
   email: String!
   businessName: String!
   permissions: [Permission!]!
-  plan: String!
-  orders: [Order]
 }
-
-# type Client {
-#   id: ID!
-#   firstName: String!
-#   lastName: String!
-#   fullName: String!
-#   dependantFirstName: String
-#   dependantLastName: String
-#   cellPhone: String!
-#   birthDay: DateTime
-#   image: String
-#   user: User!
-#   appointments: [Appointment]
-# }

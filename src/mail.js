@@ -17,10 +17,10 @@ const makeANiceEmail = text => `
     line-height: 2;
     font-size: 20px;
   ">
-    <h2>Hello!</h2>
+    <h2>Hello,</h2>
     <p>${text}</p>
 
-    <p>From The Perfect Day Reminders Team</p>
+    <p>From The Everydata Team</p>
   </div>
 `
 

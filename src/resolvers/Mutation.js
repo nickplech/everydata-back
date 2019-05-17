@@ -4,23 +4,13 @@ const { randomBytes } = require('crypto')
 const { promisify } = require('util')
 const { transport, makeANiceEmail } = require('../mail')
 const { hasPermission } = require('../utils')
-const stripe = require('../stripe')
-const { nexmo } = require('../send')
 
 const Mutations = {
   async createClient(parent, args, ctx, info) {
-    if (!ctx.request.userId) {
-      throw new Error('You must be logged in to do that!')
-    }
     let name = args.firstName
     let surName = args.lastName
     name = name.charAt(0).toUpperCase() + name.slice(1).trim()
     surName = surName.charAt(0).toUpperCase() + surName.slice(1).trim()
-
-    const dateParts = args.birthDay.split('/')
-    const ISODate = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1]
-    const birthDate = new Date(ISODate).toISOString()
-    args.birthDay = birthDate
 
     let cellPhone = args.cellPhone
     if (cellPhone.includes('_')) {
@@ -29,28 +19,49 @@ const Mutations = {
     const client = await ctx.db.mutation.createClient(
       {
         data: {
-          user: {
-            connect: {
-              id: ctx.request.userId,
-            },
-          },
           fullName: name + ' ' + surName,
+          email: args.email,
           ...args,
         },
       },
       info,
     )
+    const mailRes = await transport.sendMail({
+      from: 'info@everydata.com',
+      to: client.email,
+      subject: 'Everydata Submission',
+      html: makeANiceEmail(
+        `Thank you for your submission to Every Data ${client.firstName}!
+<br/><br/>
+        A representative will contact you during business hours.`,
+      ),
+    })
+    const mailRes2 = await transport.sendMail({
+      from: 'info@everydata.com',
+      to: 'phil@everydata.com',
+      subject: 'New Everydata Submission',
+      html: makeANiceEmail(
+        `A new submission has been received for everydata.com!
+<br/><br/>
+        \n\n  Click the following link for Admin login page: <a href="${
+          process.env.FRONTEND_URL
+        }/login">Admin Login</a>`,
+      ),
+    })
     return client
   },
   updateClient(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in to do that!')
     }
-    const dateParts = args.birthDay.split('/')
-    const ISODate = dateParts[2] + '-' + dateParts[0] + '-' + dateParts[1]
-    const birthDate = new Date(ISODate).toISOString()
-    args.birthDay = birthDate
+
     const updates = { ...args }
+    const hasPermission = ctx.request.user.permissions.some(permission =>
+      ['ADMIN'].includes(permission),
+    )
+    if (!hasPermission) {
+      throw new Error("You don't have permission to do that!")
+    }
     delete updates.id
     return ctx.db.mutation.updateClient(
       {
@@ -63,26 +74,18 @@ const Mutations = {
     )
   },
   async deleteClient(parent, args, ctx, info) {
+    if (!ctx.request.userId) {
+      throw new Error('You must be logged in to do that!')
+    }
     const where = { id: args.id }
-
-    const client = await ctx.db.query.client(
-      { where },
-      `{ id firstName user { id } }`,
-    )
-
-    const ownsClient = client.user.id === ctx.request.userId
     const hasPermission = ctx.request.user.permissions.some(permission =>
-      ['ADMIN', 'CLIENTDELETE'].includes(permission),
+      ['ADMIN'].includes(permission),
     )
-
-    if (!ownsClient && !hasPermission) {
+    if (!hasPermission) {
       throw new Error("You don't have permission to do that!")
     }
-
-    // 3. Delete it!
     return ctx.db.mutation.deleteClient({ where }, info)
   },
-
   async signup(parent, args, ctx, info) {
     args.email = args.email.toLowerCase()
     let name = args.firstName
@@ -123,7 +126,6 @@ const Mutations = {
           businessName: args.businessName,
           email: args.email,
           password,
-          plan: args.plan,
           permissions: { set: ['USER'] },
         },
       },
@@ -132,24 +134,22 @@ const Mutations = {
     const token = jwt.sign({ user: user.id }, process.env.APP_SECRET)
     ctx.response.cookie('token', token, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 1,
+      maxAge: 1000 * 60 * 60 * 24 * 365,
     })
 
     const mailRes = await transport.sendMail({
-      from: 'info@perfectdayreminders.com',
+      from: 'info@everydata.com',
       to: user.email,
-      subject: 'Perfect Day Reminders Free Trial',
+      subject: 'Everydata Submission',
       html: makeANiceEmail(
-        `Welcome to Perfect Day Reminders ${
-          user.firstName
-        }! Enjoy your Free Trial for the next two weeks!
+        `Thank you for your submission to Every Data ${user.firstName}!
 <br/><br/>
-        At the end of your trial, if you  wish to continue using Perfect Day reminders, you will simply be asked to subscribe and then continue as usual. Thank you!`,
+        A representative will contact you during business hours.`,
       ),
     })
+
     return user
   },
-
   async updateUser(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) throw new Error('Please Sign In to Complete this Update')
@@ -161,10 +161,9 @@ const Mutations = {
       },
       info,
     )
+    const hasPermissionToSee = ctx.request.user.permissions.includes('ADMIN')
     let cellPhone = args.cellPhone
-    if (cellPhone.includes('_')) {
-      throw new Error('Your phone number must be a complete US phone number')
-    }
+
     const updatedUser = await ctx.db.mutation.updateUser({
       where: { id: currentUser.id },
       data: {
@@ -173,10 +172,11 @@ const Mutations = {
         email: args.email,
       },
     })
-
+    if (!hasPermissionToSee) {
+      throw new Error('Nope! Dont have permission to do this')
+    }
     return updatedUser
   },
-
   async signin(parent, { email, password }, ctx, info) {
     const user = await ctx.db.query.user({ where: { email } })
     if (!user) {
@@ -189,7 +189,7 @@ const Mutations = {
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET)
     ctx.response.cookie('token', token, {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24 * 1,
+      maxAge: 1000 * 60 * 60 * 24 * 365,
     })
 
     return user
@@ -205,6 +205,11 @@ const Mutations = {
     if (!user) {
       throw new Error(`No such user found for email ${args.email}`)
     }
+    const hasPermissionToSee = ctx.request.user.permissions.includes('ADMIN')
+    if (!hasPermissionToSee) {
+      throw new Error('Nope! Dont have permission to do this')
+    }
+
     const randomBytesPromiseified = promisify(randomBytes)
     const resetToken = (await randomBytesPromiseified(20)).toString('hex')
     const resetTokenExpiry = Date.now() + 3600000 //1 hour from now
@@ -213,9 +218,9 @@ const Mutations = {
       data: { resetToken, resetTokenExpiry },
     })
     const mailRes = await transport.sendMail({
-      from: 'info@perfectdayreminders.com',
+      from: 'info@everydata.com',
       to: user.email,
-      subject: 'Password Reset-Perfect Day Reminders',
+      subject: 'Password Reset-EveryData',
       html: makeANiceEmail(
         `Your Password Reset Token is Here \n\n <a href="${
           process.env.FRONTEND_URL
@@ -253,7 +258,6 @@ const Mutations = {
     })
     return updatedUser
   },
-
   async updatePermissions(parent, args, ctx, info) {
     if (!ctx.request.userId) {
       throw new Error('You must be logged in!')
@@ -281,18 +285,13 @@ const Mutations = {
       info,
     )
   },
-
-  async createReason(parent, args, ctx, info) {
+  async createPost(parent, args, ctx, info) {
     const { userId } = ctx.request
     if (!userId) {
       throw new Error('You must be signed in')
     }
-    if (args.name.length < 1) {
-      throw new Error('A name/appointment type identifier is required')
-    }
-    args.name = args.name.charAt(0).toUpperCase() + args.name.slice(1)
-
-    const reason = await ctx.db.mutation.createReason(
+    const hasPermissionToSee = ctx.request.user.permissions.includes('ADMIN')
+    const post = await ctx.db.mutation.createPost(
       {
         data: {
           user: {
@@ -305,237 +304,20 @@ const Mutations = {
       },
       info,
     )
-    return reason
+    if (!hasPermissionToSee) {
+      throw new Error('You are not allowed to do this!')
+    }
+    return post
   },
-  async deleteReason(parent, args, ctx, info) {
+  async deletePost(parent, args, ctx, info) {
     const where = { id: args.id }
-    const reason = await ctx.db.query.reason({ where }, `{ id, user { id }}`)
-    if (!reason) throw new Error('No Type Found!')
-    const ownsReason = reason.user.id === ctx.request.userId
     const hasPermission = ctx.request.user.permissions.some(permission =>
       ['ADMIN'].includes(permission),
     )
-    if (!ownsReason && !hasPermission) {
-      throw new Error('Cheater!')
-    }
-
-    return ctx.db.mutation.deleteReason(
-      {
-        where: { id: args.id },
-      },
-      info,
-    )
-  },
-  async createAppointment(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!userId) throw new Error('Please Sign In')
-    const appointment = await ctx.db.mutation.createAppointment(
-      {
-        data: {
-          user: {
-            connect: {
-              id: ctx.request.userId,
-            },
-          },
-          client: {
-            connect: { id: args.client },
-          },
-          reason: {
-            connect: { id: args.reason },
-          },
-          ...args,
-        },
-      },
-      info,
-    )
-    return appointment
-  },
-  async createOrder(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!userId) {
-      throw new Error('You must be signed in')
-    }
-    const currentUser = await ctx.db.query.user(
-      {
-        where: {
-          id: userId,
-        },
-      },
-      `{ id, email, businessName, plan}`,
-    )
-    const customer = await stripe.customers.create({
-      email: currentUser.email,
-      description: currentUser.businessName,
-      source: args.token,
-    })
-
-    const charge = await stripe.subscriptions.create({
-      customer: customer.id,
-      items: [
-        {
-          plan: currentUser.plan,
-        },
-      ],
-    })
-
-    const order = await ctx.db.mutation.createOrder({
-      data: {
-        price: args.price,
-        charge: charge.customer,
-        plan: currentUser.plan,
-        user: { connect: { id: userId } },
-      },
-    })
-    return order
-  },
-  async createTextReminder(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    if (!userId) {
-      throw new Error('You must be signed in to Send SMS Reminder manually')
-    }
-    const from = '19252646214'
-    let str = args.to
-    let to = str.replace(/[\D]/g, '')
-    to = '1' + to
-    console.log(to)
-    let text = args.text
-    if (args.text.length > 160) {
-      throw new Error('Reminders cannot be larger than 160 characters!')
-    }
-    const textReminder = await ctx.db.mutation.createTextReminder(
-      {
-        data: {
-          to,
-          from,
-          text,
-          forDate: args.forDate,
-          forTime: args.forTime,
-          user: {
-            connect: { id: userId },
-          },
-          client: {
-            connect: { id: args.client },
-          },
-          confirmationStatus: args.confirmationStatus,
-        },
-      },
-      info,
-    )
-
-    const res = await nexmo.message.sendSms(
-      from,
-      to,
-      text,
-      (err, responseData) => {
-        if (err) {
-          console.log(err)
-        } else {
-          if (responseData.messages[0]['status'] === '0') {
-            console.log('Message sent successfully.')
-            console.log(responseData)
-          } else {
-            console.log(
-              `Message failed with error: ${
-                responseData.messages[0]['error-text']
-              }`,
-            )
-          }
-        }
-      },
-    )
-
-    const [existingCartItem] = await ctx.db.query.cartItems({
-      where: {
-        user: { id: userId },
-        client: { id: textReminder.client.id },
-        date: textReminder.forDate,
-        time: textReminder.forTime,
-      },
-    })
-
-    if (existingCartItem) {
-      console.log('This Confirmation Has Already Been Logged')
-      return ctx.db.mutation.updateCartItem(
-        {
-          where: { id: existingCartItem.id },
-          data: {
-            textReminder: { confirmationStatus: args.confirmationStatus },
-          },
-        },
-        info,
-      )
-    }
-    return ctx.db.mutation.createCartItem(
-      {
-        data: {
-          date: textReminder.forDate,
-          time: textReminder.forTime,
-          user: { connect: { id: userId } },
-          client: { connect: { id: args.client } },
-          textReminder: { connect: { id: textReminder.id } },
-        },
-      },
-      info,
-    )
-  },
-  async updateTextReminder(parent, args, ctx, info) {
-    const { userId } = ctx.request
-    const [textReminder] = await ctx.db.query.textReminders(
-      {
-        where: {
-          user: { id: userId },
-          client: { id: textReminder.client.id },
-          forDate: textReminder.forDate,
-          forTime: textReminder.forTime,
-        },
-      },
-      info,
-    )
-
-    const response = textReminder.text.includes('confirm', '1')
-    const reminderStatus = response ? 'CONFIRMED' : 'CANCELED'
-
-    return ctx.db.mutation.updateTextReminder(
-      {
-        where: { id: textReminder.id },
-        data: { confirmationStatus: reminderStatus },
-      },
-      info,
-    )
-  },
-  async deleteTextReminder(parent, args, ctx, info) {
-    const where = { id: args.id }
-
-    const hasPermission = ctx.request.user.permissions.some(permission =>
-      ['ADMIN'].includes(permission),
-    )
-
     if (!hasPermission) {
       throw new Error("You don't have permission to do that!")
     }
-
-    return ctx.db.mutation.deleteTextReminder({ where }, info)
-  },
-
-  async removeFromCart(parent, args, ctx, info) {
-    const cartItem = await ctx.db.query.cartItem(
-      {
-        where: {
-          id: args.id,
-        },
-      },
-      `{ id, user { id }}`,
-    )
-    if (!cartItem) throw new Error('No Confirmation Found!')
-    if (cartItem.user.id !== ctx.request.userId) {
-      throw new Error('Cheater!')
-    }
-    return ctx.db.mutation.deleteCartItem(
-      {
-        where: { id: args.id },
-      },
-      info,
-    )
+    return ctx.db.mutation.deletePost({ where }, info)
   },
 }
 
